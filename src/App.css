@@ -1,0 +1,37 @@
+#root {
+  height: 100dvh;
+  width: 100dvw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  transform: none !important;
+}
+
+.text-white {
+  color: #ffffff;
+}
+
+.text-gray {
+  color: #202529;
+}
+
+.bg-white {
+  background-color: #ffffff;
+}
+
+.bg-gray {
+  background-color: #202529;
+}
+
+.select-none {
+  -ms-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+@keyframes dash-move {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
