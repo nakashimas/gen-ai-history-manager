@@ -1,4 +1,5 @@
 import { createContext } from "react";
+import type { NodeOptions } from "./GraphContextOptions";
 
 // NodeType 定義
 const NodeType = {
@@ -25,9 +26,15 @@ export type EdgeProps = {
   to: string; // Node.id
 };
 
+export type NodeOptionProps = {
+  id: string; // Node.id
+  options: NodeOptions;
+};
+
 export type GraphContextType = {
   nodes: NodeProps[];
   edges: EdgeProps[];
+  nodeOptions: NodeOptionProps[];
   addNode: (node: NodeProps) => void;
   updateNode: (id: string, partial: Partial<NodeProps>) => void;
   removeNode: (id: string) => void;

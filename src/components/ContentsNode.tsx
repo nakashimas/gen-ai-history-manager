@@ -67,12 +67,7 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
           onDragEnd={handleDragEnd}
           onDragEndOn={onDragEndOn}
         >
-          <rect
-            width={NODE_WIDTH}
-            height={NODE_HEIGHT}
-            fill="red"
-            stroke="black"
-          />
+          <use href="#node" />
         </DraggableWidgetWrapper>
         <ContentsEdgeDraft
           id={id + EDGE_ID_PREFIX}

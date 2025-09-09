@@ -2,8 +2,12 @@ export const NODE_ID_PREFIX = "-node";
 export const EDGE_ID_PREFIX = "-edge";
 
 export const isEqualContentsId = (a?: string, b?: string) => {
-  return (
-    a?.replaceAll(NODE_ID_PREFIX, "").replaceAll(EDGE_ID_PREFIX, "") ===
-    b?.replaceAll(NODE_ID_PREFIX, "").replaceAll(EDGE_ID_PREFIX, "")
-  );
+  if (!a) a = "";
+  if (!b) b = "";
+
+  return resolveId(a) === resolveId(b);
+};
+
+export const resolveId = (id: string) => {
+  return id.replaceAll(NODE_ID_PREFIX, "").replaceAll(EDGE_ID_PREFIX, "");
 };

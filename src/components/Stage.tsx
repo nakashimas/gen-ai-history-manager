@@ -12,7 +12,8 @@ import {
 import { useGraph } from "../hooks/useGraph";
 import type { EdgeProps, NodeProps } from "../contexts/GraphContext";
 import { ContentsEdge } from "./ContentsEdge";
-import { EDGE_MARKER_WIDTH } from "../utils/constants";
+import { EDGE_ID_PREFIX, resolveId } from "../utils/contentsId";
+import { ContentsNodeDefs } from "./ContentsNodeDefs";
 
 export const Stage: React.FC = () => {
   const { zoom, offset, bind } = useZoomPan(1, { x: 0, y: 0 });
@@ -43,7 +44,13 @@ export const Stage: React.FC = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDragEndOn = (a: string, b: string, _x: number, _y: number) => {
-    addEdge({ id: self.crypto.randomUUID(), from: a, to: b });
+    if (a.endsWith(EDGE_ID_PREFIX)) {
+      addEdge({
+        id: self.crypto.randomUUID(),
+        from: resolveId(a),
+        to: resolveId(b),
+      });
+    }
   };
 
   const generateNode = (node: NodeProps) => {
@@ -79,48 +86,7 @@ export const Stage: React.FC = () => {
               {...bind} // wheel/pan イベントを適用
             >
               {/* 参照用 */}
-              <defs>
-                <marker
-                  id="edge-arrowhead"
-                  markerWidth={EDGE_MARKER_WIDTH}
-                  markerHeight={EDGE_MARKER_WIDTH}
-                  refX={EDGE_MARKER_WIDTH / 2}
-                  refY={EDGE_MARKER_WIDTH / 2}
-                  orient="auto"
-                  markerUnits="strokeWidth"
-                >
-                  <circle
-                    cx={EDGE_MARKER_WIDTH / 2}
-                    cy={EDGE_MARKER_WIDTH / 2}
-                    r={EDGE_MARKER_WIDTH / 2 - 1}
-                    fill="white"
-                    stroke="black"
-                    strokeWidth="2"
-                  />
-                  <circle
-                    cx={EDGE_MARKER_WIDTH / 2}
-                    cy={EDGE_MARKER_WIDTH / 2}
-                    r={EDGE_MARKER_WIDTH / 4}
-                    fill="black"
-                  />
-                </marker>
-                <marker
-                  id="edge-arrowhead-disabled"
-                  markerWidth={EDGE_MARKER_WIDTH}
-                  markerHeight={EDGE_MARKER_WIDTH}
-                  refX={EDGE_MARKER_WIDTH / 2}
-                  refY={EDGE_MARKER_WIDTH / 2}
-                  orient="auto"
-                  markerUnits="strokeWidth"
-                >
-                  <circle
-                    cx={EDGE_MARKER_WIDTH / 2}
-                    cy={EDGE_MARKER_WIDTH / 2}
-                    r={EDGE_MARKER_WIDTH / 4}
-                    fill="black"
-                  />
-                </marker>
-              </defs>
+              <ContentsNodeDefs />
 
               {/* Stage 全体 transform */}
               <g

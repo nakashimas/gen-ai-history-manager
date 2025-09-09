@@ -7,7 +7,7 @@ import { useGraph } from "../hooks/useGraph";
 const ContentsNodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
   const { isMenuOpen, openMenu, closeMenu } = useMenu();
   const { dragInfo } = useDrag();
-  const { nodes, edges } = useGraph();
+  const { nodes, edges, nodeOptions } = useGraph();
   const { menuHeight, bind } = useMenuHeight(300);
 
   const [recentDragSourceId, setRecentDragSourceId] = useState<string>();
@@ -54,6 +54,8 @@ const ContentsNodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
         <span>{JSON.stringify(nodes)}</span>
         <hr></hr>
         <span>{JSON.stringify(edges)}</span>
+        <hr></hr>
+        <span>{JSON.stringify(nodeOptions)}</span>
       </div>
     </div>
   );
