@@ -7,3 +7,6 @@ export const NODE_HEIGHT = 148;
 
 export const EDGE_WIDTH = 2;
 export const EDGE_MARKER_WIDTH = 12;
+
+export const COLOR_BLACK = "#202529";
+export const COLOR_WHITE = "white";

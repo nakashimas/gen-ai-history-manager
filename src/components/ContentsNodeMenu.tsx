@@ -1,20 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, type JSX } from "react";
 import { useMenu } from "../hooks/useMenu";
 import { useMenuHeight } from "../hooks/useMenuHeight";
 import { useDrag } from "../hooks/useDrag";
-import { useGraph } from "../hooks/useGraph";
+import ContentsNodeMenuHelp from "./ContentsNodeMenuHelp";
+import {
+  GLOBAL_DEBUG_MENU_ID,
+  GLOBAL_HELP_MENU_ID,
+  GLOBAL_SETTINGS_MENU_ID,
+} from "../utils/constants";
+import ContentsNodeMenuDebug from "./ContentsNodeMenuDebug";
+import ContentsNodeMenuSettings from "./ContentsNodeMenuSettings";
+import ContentsNodeMenuEdit from "./ContentsNodeMenuEdit";
 
 const ContentsNodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
   const { isMenuOpen, openMenu, closeMenu } = useMenu();
   const { dragInfo } = useDrag();
-  const { nodes, edges, nodeOptions } = useGraph();
   const { menuHeight, bind } = useMenuHeight(300);
 
-  const [recentDragSourceId, setRecentDragSourceId] = useState<string>();
+  const [recentDragSourceId, setRecentDragSourceId] =
+    useState<string>(GLOBAL_HELP_MENU_ID);
 
   useEffect(() => {
     if (dragInfo?.sourceId) setRecentDragSourceId(dragInfo.sourceId);
   }, [dragInfo, setRecentDragSourceId]);
+
+  const menuMap: Record<string, JSX.Element> = {
+    [GLOBAL_DEBUG_MENU_ID]: <ContentsNodeMenuDebug />,
+    [GLOBAL_SETTINGS_MENU_ID]: <ContentsNodeMenuSettings />,
+    [GLOBAL_HELP_MENU_ID]: <ContentsNodeMenuHelp />,
+  };
 
   return (
     <div className="fixed bottom-[0px] left-0 w-full z-20 pointer-events-auto">
@@ -49,13 +63,9 @@ const ContentsNodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
         style={{ height: (isMenuOpen ? menuHeight : 0) + "px" }}
         className="bg-white"
       >
-        <span>{recentDragSourceId}</span>
-        <hr></hr>
-        <span>{JSON.stringify(nodes)}</span>
-        <hr></hr>
-        <span>{JSON.stringify(edges)}</span>
-        <hr></hr>
-        <span>{JSON.stringify(nodeOptions)}</span>
+        {menuMap[recentDragSourceId] ?? (
+          <ContentsNodeMenuEdit recentDragSourceId={recentDragSourceId} />
+        )}
       </div>
     </div>
   );

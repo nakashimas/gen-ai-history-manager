@@ -13,6 +13,8 @@ export type ContentsNodeProps = {
   onDrag?: (id: string, x: number, y: number) => void;
   onDragEnd?: (id: string, x: number, y: number) => void;
   onDragEndOn?: (a: string, b: string, x: number, y: number) => void;
+  onClickNodeDelete?: () => void;
+  onClickNodeReproduction?: () => void;
 };
 
 export type ContentsNodeHandle = {
@@ -21,7 +23,20 @@ export type ContentsNodeHandle = {
 };
 
 export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
-  ({ id, x, y, onDragStart, onDrag, onDragEnd, onDragEndOn }, ref) => {
+  (
+    {
+      id,
+      x,
+      y,
+      onDragStart,
+      onDrag,
+      onDragEnd,
+      onDragEndOn,
+      onClickNodeDelete,
+      onClickNodeReproduction,
+    },
+    ref
+  ) => {
     const { openMenu } = useMenu();
     const [pos, setPos] = useState({ x, y });
 
@@ -67,7 +82,21 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
           onDragEnd={handleDragEnd}
           onDragEndOn={onDragEndOn}
         >
-          <use href="#node" />
+          <use href="#node-background" />
+          {/* <use href="#node-foreground" /> */}
+
+          <use
+            x={NODE_WIDTH / 2}
+            y={NODE_HEIGHT}
+            href="#node-remove"
+            onClick={onClickNodeDelete}
+          />
+          <use
+            x={NODE_WIDTH / 4}
+            y={NODE_HEIGHT}
+            href="#node-reproduction"
+            onClick={onClickNodeReproduction}
+          />
         </DraggableWidgetWrapper>
         <ContentsEdgeDraft
           id={id + EDGE_ID_PREFIX}

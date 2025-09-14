@@ -12,12 +12,25 @@ import {
 import { useGraph } from "../hooks/useGraph";
 import type { EdgeProps, NodeProps } from "../contexts/GraphContext";
 import { ContentsEdge } from "./ContentsEdge";
-import { EDGE_ID_PREFIX, resolveId } from "../utils/contentsId";
+import {
+  EDGE_ID_PREFIX,
+  isEqualContentsId,
+  resolveId,
+} from "../utils/contentsId";
 import { ContentsNodeDefs } from "./ContentsNodeDefs";
 
 export const Stage: React.FC = () => {
   const { zoom, offset, bind } = useZoomPan(1, { x: 0, y: 0 });
-  const { nodes, edges, updateNode, addEdge } = useGraph();
+  const {
+    nodes,
+    edges,
+    nodeOptions,
+    addNode,
+    updateNode,
+    removeNode,
+    addEdge,
+    addNodeOptions,
+  } = useGraph();
   const nodeRefs = useRef<
     Map<string, React.RefObject<ContentsNodeHandle | null>>
   >(new Map());
@@ -53,6 +66,33 @@ export const Stage: React.FC = () => {
     }
   };
 
+  const handleClickNodeDelete = (id: string) => {
+    removeNode(id);
+  };
+
+  const handleClickNodeReproduction = (id: string) => {
+    const targetNode = nodes.find((n) => isEqualContentsId(n.id, id));
+    const targetNodeOptions = nodeOptions.find((o) =>
+      isEqualContentsId(o.id, id)
+    );
+    const newId = self.crypto.randomUUID();
+
+    if (targetNode) {
+      addNode({
+        id: newId,
+        x: targetNode.x + 10,
+        y: targetNode.y + 10,
+        type: targetNode.type,
+      });
+    }
+    if (targetNodeOptions?.options) {
+      addNodeOptions({
+        id: newId,
+        options: { ...targetNodeOptions.options },
+      });
+    }
+  };
+
   const generateNode = (node: NodeProps) => {
     const refs = nodeRefs.current.get(node.id);
     return (
@@ -66,6 +106,8 @@ export const Stage: React.FC = () => {
         onDrag={handleDrag}
         onDragEnd={handleDragEnd}
         onDragEndOn={handleDragEndOn}
+        onClickNodeDelete={() => handleClickNodeDelete(node.id)}
+        onClickNodeReproduction={() => handleClickNodeReproduction(node.id)}
       />
     );
   };

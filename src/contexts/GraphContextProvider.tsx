@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { GraphContext, type EdgeProps, type NodeProps } from "./GraphContext";
+import {
+  GraphContext,
+  type EdgeProps,
+  type NodeProps,
+  type NodeOptionProps,
+} from "./GraphContext";
 import { isEqualContentsId } from "../utils/contentsId";
 
 export const GraphContextProvider: React.FC<{
@@ -7,6 +12,7 @@ export const GraphContextProvider: React.FC<{
 }> = ({ children }) => {
   const [edges, setEdges] = useState<EdgeProps[]>([]);
   const [nodes, setNodes] = useState<NodeProps[]>([]);
+  const [nodeOptions, setNodeOptions] = useState<NodeOptionProps[]>([]);
 
   useEffect(() => {}, []);
 
@@ -25,6 +31,8 @@ export const GraphContextProvider: React.FC<{
     setNodes((prev) => prev.filter((n) => n.id !== id));
     // ノード削除に伴ってエッジも削除
     setEdges((prev) => prev.filter((e) => e.from !== id && e.to !== id));
+    // ノード削除に伴ってノード情報も削除
+    setNodeOptions((prev) => prev.filter((o) => o.id !== id && o.id !== id));
   };
 
   // --- エッジ操作 ---
@@ -36,16 +44,35 @@ export const GraphContextProvider: React.FC<{
     setEdges((prev) => prev.filter((e) => e.id !== id));
   };
 
+  // --- ノード情報操作 ---
+  const addNodeOptions = (nodeOption: NodeOptionProps) => {
+    setNodeOptions((prev) => [...prev, nodeOption]);
+  };
+
+  const updateNodeOptions = (id: string, partial: Partial<NodeOptionProps>) => {
+    setNodeOptions((prev) =>
+      prev.map((o) => (isEqualContentsId(o.id, id) ? { ...o, ...partial } : o))
+    );
+  };
+
+  const removeNodeOptions = (id: string) => {
+    setNodeOptions((prev) => prev.filter((o) => o.id !== id));
+  };
+
   return (
     <GraphContext.Provider
       value={{
         nodes,
         edges,
+        nodeOptions,
         addNode,
         updateNode,
         removeNode,
         addEdge,
         removeEdge,
+        addNodeOptions,
+        updateNodeOptions,
+        removeNodeOptions,
       }}
     >
       {children}

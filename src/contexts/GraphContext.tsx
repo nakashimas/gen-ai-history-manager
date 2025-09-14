@@ -40,6 +40,9 @@ export type GraphContextType = {
   removeNode: (id: string) => void;
   addEdge: (edge: EdgeProps) => void;
   removeEdge: (id: string) => void;
+  addNodeOptions: (node: NodeOptionProps) => void;
+  updateNodeOptions: (id: string, partial: Partial<NodeOptionProps>) => void;
+  removeNodeOptions: (id: string) => void;
 };
 
 export const GraphContext = createContext<GraphContextType | null>(null);

@@ -1,5 +1,6 @@
 import { useState, useImperativeHandle, forwardRef, useRef } from "react";
 import { DraggableWidgetWrapper } from "./DraggableWidgetWrapper";
+import { COLOR_BLACK } from "../utils/constants";
 
 export type ContentsEdgeProps = {
   id: string;
@@ -82,7 +83,7 @@ export const ContentsEdgeDraft = forwardRef<
         y1={sourcePos.y}
         x2={targetPos.x}
         y2={targetPos.y}
-        stroke="black"
+        stroke={COLOR_BLACK}
         strokeWidth={2}
         strokeDasharray="6 4" // 点線パターン: 6px 線 + 4px スペース
         strokeDashoffset={0} // 初期オフセット
