@@ -61,11 +61,13 @@ const ContentsNodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
       {/* メニュー 本体 */}
       <div
         style={{ height: (isMenuOpen ? menuHeight : 0) + "px" }}
-        className="bg-white"
+        className="bg-white overflow-hidden"
       >
-        {menuMap[recentDragSourceId] ?? (
-          <ContentsNodeMenuEdit recentDragSourceId={recentDragSourceId} />
-        )}
+        <div className="overflow-y-auto h-full">
+          {menuMap[recentDragSourceId] ?? (
+            <ContentsNodeMenuEdit recentDragSourceId={recentDragSourceId} />
+          )}
+        </div>
       </div>
     </div>
   );

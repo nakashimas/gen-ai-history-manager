@@ -43,8 +43,9 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
           icon="add"
           title="Create Node"
           handleClick={() => {
+            const newId = self.crypto.randomUUID();
             addNode({
-              id: self.crypto.randomUUID(),
+              id: newId,
               x: 5,
               y: 5,
               type: 0,

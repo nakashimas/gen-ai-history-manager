@@ -50,6 +50,9 @@ export const GraphContextProvider: React.FC<{
   };
 
   const updateNodeOptions = (id: string, partial: Partial<NodeOptionProps>) => {
+    const prevOption = nodeOptions.find((n) => isEqualContentsId(n.id, id));
+    if (!prevOption) addNodeOptions({ id: id });
+
     setNodeOptions((prev) =>
       prev.map((o) => (isEqualContentsId(o.id, id) ? { ...o, ...partial } : o))
     );

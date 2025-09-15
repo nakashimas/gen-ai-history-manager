@@ -1,8 +1,8 @@
 type OverrideOptions<A, B> = Omit<A, keyof B> & B;
 
 export type BaseNodeOptions = {
-  label: string; // 表示名
-  description: string; // 詳細説明
+  label?: string; // 表示名
+  description?: string; // 詳細説明
   result?: unknown;
 };
 
@@ -34,15 +34,15 @@ export type VideoNodeOptions = OverrideOptions<
 export type PreprocessingNodeOptions = OverrideOptions<
   BaseNodeOptions,
   {
-    command: string;
+    command?: string;
   }
 >;
 
 export type APINodeOptions = OverrideOptions<
   BaseNodeOptions,
   {
-    apiType: "REST" | "RPC";
-    endpoint: string; // APIのURL
+    apiType?: "REST" | "RPC";
+    endpoint?: string; // APIのURL
     method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"; // RESTのみ
     headers?: Record<string, string>; // 任意のHTTPヘッダー
     query?: Record<string, string | number | boolean>; // クエリパラメータ

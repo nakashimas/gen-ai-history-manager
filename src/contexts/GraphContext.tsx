@@ -28,7 +28,7 @@ export type EdgeProps = {
 
 export type NodeOptionProps = {
   id: string; // Node.id
-  options: NodeOptions;
+  options?: NodeOptions;
 };
 
 export type GraphContextType = {
@@ -40,7 +40,7 @@ export type GraphContextType = {
   removeNode: (id: string) => void;
   addEdge: (edge: EdgeProps) => void;
   removeEdge: (id: string) => void;
-  addNodeOptions: (node: NodeOptionProps) => void;
+  addNodeOptions: (nodeOption: NodeOptionProps) => void;
   updateNodeOptions: (id: string, partial: Partial<NodeOptionProps>) => void;
   removeNodeOptions: (id: string) => void;
 };
