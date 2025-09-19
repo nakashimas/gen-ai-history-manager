@@ -67,9 +67,6 @@ const ContentsNodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
             }}
           ></MarkdownEditor>
         )}
-        <span>{JSON.stringify(node)}</span>
-        <span>{JSON.stringify(nodeOption)}</span>
-        <span>{editorRef?.current?.getValue()}</span>
       </div>
     </>
   );

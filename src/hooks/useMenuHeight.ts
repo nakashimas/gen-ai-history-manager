@@ -4,6 +4,8 @@ import { useMenu } from "./useMenu";
 export function useMenuHeight(initialMenuHeight: number = 300) {
   const [menuHeight, setMenuHeight] = useState(initialMenuHeight);
   const { isMenuOpen, openMenu, closeMenu } = useMenu();
+  const minHeight = 20;
+  const maxHeight = window.innerHeight - 25;
 
   // ---- PC用（ドラッグでリサイズ）
   const onMouseDown = useCallback(
@@ -14,21 +16,27 @@ export function useMenuHeight(initialMenuHeight: number = 300) {
       const startY = e.clientY;
       const startHeight = Number(menuHeight);
 
+      const setFixedMenuHeight = (newHeight: number) => {
+        if (newHeight <= minHeight) {
+          setMenuHeight(initialMenuHeight);
+          closeMenu();
+        } else if (newHeight >= maxHeight) {
+          setMenuHeight(maxHeight);
+        } else {
+          setMenuHeight(newHeight);
+        }
+      };
+
       const onMouseMove = (moveEvent: MouseEvent) => {
         // 画面の下からなのでマイナスをとる
         if (!isMenuOpen) {
           // 閉じている状態からのドラッグ
-          setMenuHeight(window.innerHeight - moveEvent.clientY);
-          openMenu();
+          const newHeight = window.innerHeight - moveEvent.clientY;
+          setFixedMenuHeight(newHeight);
+          if (newHeight >= minHeight) openMenu();
         } else {
           const newHeight = startHeight - (moveEvent.clientY - startY);
-
-          if (newHeight <= 20) {
-            setMenuHeight(initialMenuHeight);
-            closeMenu();
-          } else {
-            setMenuHeight(newHeight);
-          }
+          setFixedMenuHeight(newHeight);
         }
       };
 
@@ -40,7 +48,7 @@ export function useMenuHeight(initialMenuHeight: number = 300) {
       window.addEventListener("mousemove", onMouseMove);
       window.addEventListener("mouseup", onMouseUp);
     },
-    [menuHeight, isMenuOpen, openMenu, closeMenu, initialMenuHeight]
+    [menuHeight, maxHeight, isMenuOpen, initialMenuHeight, closeMenu, openMenu]
   );
 
   // ---- モバイル用（ドラッグでリサイズ）
