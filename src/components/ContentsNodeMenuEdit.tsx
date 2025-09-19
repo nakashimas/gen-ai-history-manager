@@ -1,25 +1,42 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { useGraph } from "../hooks/useGraph";
 import { isEqualContentsId, resolveId } from "../utils/contentsId";
 import MarkdownEditor, {
   type MarkdownEditorHandle,
 } from "./form/MarkdownEditor";
 import ContentsNodeMenuHelp from "./ContentsNodeMenuHelp";
-import EditableTitle from "./form/EditableTitle";
+import EditableTitle, { type EditableTitleHandle } from "./form/EditableTitle";
 
 const ContentsNodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
   recentDragSourceId,
 }) => {
+  // 元データ取得
   const { nodes, nodeOptions, updateNodeOptions } = useGraph();
-  const editorRef = useRef<MarkdownEditorHandle>(null);
-
   const node = nodes.find((n) => isEqualContentsId(n.id, recentDragSourceId));
-
-  if (!node) return <ContentsNodeMenuHelp />;
-
   const nodeOption = nodeOptions.find((n) =>
     isEqualContentsId(n.id, recentDragSourceId)
-  ) ?? { id: resolveId(node.id) };
+  ) ?? { id: resolveId(node?.id ?? "") };
+
+  // 編集可能データのrefと初期値
+  // TODO: このあたり整理できないか
+  const editorRef = useRef<MarkdownEditorHandle>(null);
+  const titleRef = useRef<EditableTitleHandle>(null);
+
+  const initialTitleValue = nodeOption?.options?.label ?? "";
+  const initialDataValue =
+    nodeOption?.options &&
+    "data" in nodeOption.options &&
+    nodeOption.options.data
+      ? nodeOption.options.data
+      : "";
+
+  // 変更検知など
+  useEffect(() => {
+    titleRef?.current?.setTitle(initialTitleValue);
+    editorRef?.current?.setValue(initialDataValue);
+  }, [initialTitleValue, initialDataValue]);
+
+  if (!node) return <ContentsNodeMenuHelp />;
 
   return (
     <>
@@ -28,7 +45,8 @@ const ContentsNodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
         <div className="mb-5 flex">
           <h1 className="text-lg font-semibold truncate me-2">Edit Node:</h1>
           <EditableTitle
-            initialTitle={nodeOption?.options?.label}
+            ref={titleRef}
+            initialTitle={initialTitleValue}
             onSave={(newTitle) => {
               updateNodeOptions(node.id, {
                 options: { label: newTitle },
@@ -41,13 +59,7 @@ const ContentsNodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
         {node.type === 0 && (
           <MarkdownEditor
             ref={editorRef}
-            initialValue={
-              nodeOption?.options &&
-              "data" in nodeOption.options &&
-              nodeOption.options.data
-                ? nodeOption.options.data
-                : ""
-            }
+            initialValue={initialDataValue}
             onChange={(value) => {
               updateNodeOptions(node.id, {
                 options: { data: value },
@@ -57,6 +69,7 @@ const ContentsNodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
         )}
         <span>{JSON.stringify(node)}</span>
         <span>{JSON.stringify(nodeOption)}</span>
+        <span>{editorRef?.current?.getValue()}</span>
       </div>
     </>
   );

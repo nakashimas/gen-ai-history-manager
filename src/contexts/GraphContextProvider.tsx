@@ -6,6 +6,7 @@ import {
   type NodeOptionProps,
 } from "./GraphContext";
 import { isEqualContentsId } from "../utils/contentsId";
+import { deepMerge } from "../utils/deepMerge";
 
 export const GraphContextProvider: React.FC<{
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export const GraphContextProvider: React.FC<{
 
   const updateNode = (id: string, partial: Partial<NodeProps>) => {
     setNodes((prev) =>
-      prev.map((n) => (isEqualContentsId(n.id, id) ? { ...n, ...partial } : n))
+      prev.map((n) => (isEqualContentsId(n.id, id) ? deepMerge(n, partial) : n))
     );
   };
 
@@ -53,8 +54,10 @@ export const GraphContextProvider: React.FC<{
     const prevOption = nodeOptions.find((n) => isEqualContentsId(n.id, id));
     if (!prevOption) addNodeOptions({ id: id });
 
+    console.log(nodeOptions, partial);
+
     setNodeOptions((prev) =>
-      prev.map((o) => (isEqualContentsId(o.id, id) ? { ...o, ...partial } : o))
+      prev.map((o) => (isEqualContentsId(o.id, id) ? deepMerge(o, partial) : o))
     );
   };
 

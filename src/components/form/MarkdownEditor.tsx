@@ -1,8 +1,14 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import {
+  forwardRef,
+  memo,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import EasyMDE from "easymde";
 import "easymde/dist/easymde.min.css";
 
-type MarkdownEditorProps = {
+export type MarkdownEditorProps = {
   initialValue?: string;
   onChange?: (value: string) => void;
 };
@@ -35,7 +41,7 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
       });
 
       // 値変更イベント
-      editorRef.current.codemirror.on("change", () => {
+      editorRef.current.codemirror.on("blur", () => {
         if (onChange) onChange(editorRef.current?.value() || "");
       });
 
@@ -54,4 +60,4 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
   }
 );
 
-export default MarkdownEditor;
+export default memo(MarkdownEditor);
