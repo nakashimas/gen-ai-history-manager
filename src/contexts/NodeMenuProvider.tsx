@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ContentsNodeMenuContext } from "./ContentsNodeMenuContext";
+import { NodeMenuContext } from "./NodeMenuContext";
 
-export const ContentsNodeMenuProvider: React.FC<{
+export const NodeMenuProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,10 +10,8 @@ export const ContentsNodeMenuProvider: React.FC<{
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <ContentsNodeMenuContext.Provider
-      value={{ isMenuOpen, openMenu, closeMenu }}
-    >
+    <NodeMenuContext.Provider value={{ isMenuOpen, openMenu, closeMenu }}>
       {children}
-    </ContentsNodeMenuContext.Provider>
+    </NodeMenuContext.Provider>
   );
 };

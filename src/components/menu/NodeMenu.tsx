@@ -1,18 +1,18 @@
 import React, { useEffect, useState, type JSX } from "react";
-import { useMenu } from "../hooks/useMenu";
-import { useMenuHeight } from "../hooks/useMenuHeight";
-import { useDrag } from "../hooks/useDrag";
-import ContentsNodeMenuHelp from "./ContentsNodeMenuHelp";
+import { useMenu } from "../../hooks/useMenu";
+import { useMenuHeight } from "../../hooks/useMenuHeight";
+import { useDrag } from "../../hooks/useDrag";
+import NodeMenuHelp from "./NodeMenuHelp";
+import NodeMenuDebug from "./NodeMenuDebug";
+import NodeMenuSettings from "./NodeMenuSettings";
+import NodeMenuEdit from "./NodeMenuEdit";
 import {
   GLOBAL_DEBUG_MENU_ID,
   GLOBAL_HELP_MENU_ID,
   GLOBAL_SETTINGS_MENU_ID,
-} from "../utils/constants";
-import ContentsNodeMenuDebug from "./ContentsNodeMenuDebug";
-import ContentsNodeMenuSettings from "./ContentsNodeMenuSettings";
-import ContentsNodeMenuEdit from "./ContentsNodeMenuEdit";
+} from "../../utils/constants";
 
-const ContentsNodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
+const NodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
   const { isMenuOpen, openMenu, closeMenu } = useMenu();
   const { dragInfo } = useDrag();
   const { menuHeight, bind } = useMenuHeight(300);
@@ -25,9 +25,9 @@ const ContentsNodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
   }, [dragInfo, setRecentDragSourceId]);
 
   const menuMap: Record<string, JSX.Element> = {
-    [GLOBAL_DEBUG_MENU_ID]: <ContentsNodeMenuDebug />,
-    [GLOBAL_SETTINGS_MENU_ID]: <ContentsNodeMenuSettings />,
-    [GLOBAL_HELP_MENU_ID]: <ContentsNodeMenuHelp />,
+    [GLOBAL_DEBUG_MENU_ID]: <NodeMenuDebug />,
+    [GLOBAL_SETTINGS_MENU_ID]: <NodeMenuSettings />,
+    [GLOBAL_HELP_MENU_ID]: <NodeMenuHelp />,
   };
 
   return (
@@ -65,7 +65,7 @@ const ContentsNodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
       >
         <div className="overflow-y-auto h-full">
           {menuMap[recentDragSourceId] ?? (
-            <ContentsNodeMenuEdit recentDragSourceId={recentDragSourceId} />
+            <NodeMenuEdit recentDragSourceId={recentDragSourceId} />
           )}
         </div>
       </div>
@@ -73,4 +73,4 @@ const ContentsNodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
   );
 };
 
-export default ContentsNodeMenu;
+export default NodeMenu;

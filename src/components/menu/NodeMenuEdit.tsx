@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from "react";
-import { useGraph } from "../hooks/useGraph";
-import { isEqualContentsId, resolveId } from "../utils/contentsId";
+import { useGraph } from "../../hooks/useGraph";
+import { isEqualContentsId, resolveId } from "../../utils/contentsId";
 import MarkdownEditor, {
   type MarkdownEditorHandle,
-} from "./form/MarkdownEditor";
-import ContentsNodeMenuHelp from "./ContentsNodeMenuHelp";
-import EditableTitle, { type EditableTitleHandle } from "./form/EditableTitle";
+} from "../form/MarkdownEditor";
+import EditableTitle, { type EditableTitleHandle } from "../form/EditableTitle";
+import NodeMenuHelp from "./NodeMenuHelp";
 
-const ContentsNodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
+const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
   recentDragSourceId,
 }) => {
   // 元データ取得
@@ -36,7 +36,7 @@ const ContentsNodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
     editorRef?.current?.setValue(initialDataValue);
   }, [initialTitleValue, initialDataValue]);
 
-  if (!node) return <ContentsNodeMenuHelp />;
+  if (!node) return <NodeMenuHelp />;
 
   return (
     <>
@@ -72,4 +72,4 @@ const ContentsNodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
   );
 };
 
-export default ContentsNodeMenuEdit;
+export default NodeMenuEdit;

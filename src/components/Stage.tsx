@@ -2,8 +2,8 @@ import React, { useRef } from "react";
 import { DraggableWidgetProvider } from "../contexts/DraggableWidgetProvider";
 import { StageContext } from "../contexts/StageContext";
 import { useZoomPan } from "../hooks/useZoomPan";
-import { ContentsNodeMenuProvider } from "../contexts/ContentsNodeMenuProvider";
-import ContentsNodeMenu from "./ContentsNodeMenu";
+import { NodeMenuProvider } from "../contexts/NodeMenuProvider";
+import NodeMenu from "./menu/NodeMenu";
 import StageRibbonMenu from "./StageRibbonMenu";
 import {
   ContentsNode,
@@ -117,7 +117,7 @@ export const Stage: React.FC = () => {
   };
 
   return (
-    <ContentsNodeMenuProvider>
+    <NodeMenuProvider>
       <DraggableWidgetProvider>
         <StageRibbonMenu />
         <StageContext.Provider value={{ zoom, offset }}>
@@ -140,8 +140,8 @@ export const Stage: React.FC = () => {
             </svg>
           </div>
         </StageContext.Provider>
-        <ContentsNodeMenu />
+        <NodeMenu />
       </DraggableWidgetProvider>
-    </ContentsNodeMenuProvider>
+    </NodeMenuProvider>
   );
 };

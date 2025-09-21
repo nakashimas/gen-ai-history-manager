@@ -1,7 +1,7 @@
 import React from "react";
-import { useGraph } from "../hooks/useGraph";
+import { useGraph } from "../../hooks/useGraph";
 
-const ContentsNodeMenuDebug: React.FC = () => {
+const NodeMenuDebug: React.FC = () => {
   const { nodes, edges, nodeOptions } = useGraph();
 
   return (
@@ -15,4 +15,4 @@ const ContentsNodeMenuDebug: React.FC = () => {
   );
 };
 
-export default ContentsNodeMenuDebug;
+export default NodeMenuDebug;

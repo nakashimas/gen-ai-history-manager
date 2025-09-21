@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { ContentsNodeMenuContext } from "../contexts/ContentsNodeMenuContext";
+import { NodeMenuContext } from "../contexts/NodeMenuContext";
 
 export const useMenu = () => {
-  const ctx = useContext(ContentsNodeMenuContext);
+  const ctx = useContext(NodeMenuContext);
   if (!ctx) throw new Error("useMenu must be used within MenuProvider");
   return ctx;
 };
