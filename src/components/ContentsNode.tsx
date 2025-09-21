@@ -3,7 +3,13 @@ import { DraggableWidgetWrapper } from "./DraggableWidgetWrapper";
 import { useMenu } from "../hooks/useMenu";
 import { ContentsEdgeDraft } from "./ContentsEdgeDraft";
 import { NODE_HEIGHT, NODE_WIDTH } from "../utils/constants";
-import { EDGE_ID_PREFIX, NODE_ID_PREFIX } from "../utils/contentsId";
+import {
+  EDGE_ID_PREFIX,
+  isEqualContentsId,
+  NODE_ID_PREFIX,
+  resolveId,
+} from "../utils/contentsId";
+import { useGraph } from "../hooks/useGraph";
 
 export type ContentsNodeProps = {
   id: string;
@@ -37,6 +43,14 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
     },
     ref
   ) => {
+    // 元データ取得
+    const { nodes, nodeOptions } = useGraph();
+    const node = nodes.find((n) => isEqualContentsId(n.id, id));
+    const nodeOption = nodeOptions.find((n) => isEqualContentsId(n.id, id)) ?? {
+      id: resolveId(node?.id ?? ""),
+    };
+
+    // 保持するデータ
     const { openMenu } = useMenu();
     const [pos, setPos] = useState({ x, y });
 
@@ -82,9 +96,22 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
           onDragEnd={handleDragEnd}
           onDragEndOn={onDragEndOn}
         >
-          <use href="#node-background" />
-          {/* <use href="#node-foreground" /> */}
+          {/* タイトル */}
+          <text dy={-6} dx={3}>
+            {nodeOption.options?.label}
+          </text>
 
+          {/* 背景 */}
+          <use href="#node-background" />
+
+          {/* アイコン */}
+          <use
+            href={`#node-foreground-${node?.type ?? 0}`}
+            x={NODE_WIDTH / 2}
+            y={NODE_HEIGHT / 2}
+          />
+
+          {/* Utils Button */}
           <use
             x={NODE_WIDTH / 2}
             y={NODE_HEIGHT}
