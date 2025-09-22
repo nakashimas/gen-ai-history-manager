@@ -1,15 +1,5 @@
 import { createContext } from "react";
-import type { NodeOptions } from "./GraphContextOptions";
-
-// NodeType 定義
-const NodeType = {
-  Plaintext: 0,
-  Picture: 1,
-  Video: 2,
-  Preprocessing: 3,
-  API: 4,
-  AI: 5,
-} as const;
+import { NodeType, type NodeOptions } from "./GraphContextOptions";
 
 export type NodeType = (typeof NodeType)[keyof typeof NodeType];
 

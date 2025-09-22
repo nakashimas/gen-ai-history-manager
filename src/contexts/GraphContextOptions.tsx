@@ -34,7 +34,7 @@ export type VideoNodeOptions = OverrideOptions<
 export type PreprocessingNodeOptions = OverrideOptions<
   BaseNodeOptions,
   {
-    command?: string;
+    data?: string;
   }
 >;
 
@@ -68,3 +68,13 @@ export type NodeOptions =
   | PreprocessingNodeOptions
   | APINodeOptions
   | AINodeOptions;
+
+// NodeType 定義
+export const NodeType = {
+  Plaintext: 0,
+  Picture: 1,
+  Video: 2,
+  Preprocessing: 3,
+  API: 4,
+  AI: 5,
+} as const;

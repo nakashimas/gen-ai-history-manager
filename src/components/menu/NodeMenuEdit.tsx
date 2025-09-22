@@ -6,12 +6,13 @@ import MarkdownEditor, {
 } from "../form/MarkdownEditor";
 import EditableTitle, { type EditableTitleHandle } from "../form/EditableTitle";
 import NodeMenuHelp from "./NodeMenuHelp";
+import { NodeType } from "../../contexts/GraphContextOptions";
 
 const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
   recentDragSourceId,
 }) => {
   // 元データ取得
-  const { nodes, nodeOptions, updateNodeOptions } = useGraph();
+  const { nodes, nodeOptions, updateNode, updateNodeOptions } = useGraph();
   const node = nodes.find((n) => isEqualContentsId(n.id, recentDragSourceId));
   const nodeOption = nodeOptions.find((n) =>
     isEqualContentsId(n.id, recentDragSourceId)
@@ -43,6 +44,7 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
       <div className="mx-auto max-w-2xl py-5">
         {/* 共通部分 */}
         <div className="mb-5 flex">
+          {/* NodeOptions.label */}
           <h1 className="text-lg font-semibold truncate me-2">Edit Node:</h1>
           <EditableTitle
             ref={titleRef}
@@ -54,9 +56,37 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
             }}
           />
         </div>
+        <div className="mb-5 flex">
+          {/* Node.type */}
+          <select
+            id="node-type"
+            className="border border-gray-300 text-black text-sm rounded-lg block w-full p-1.5"
+            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+              updateNode(node.id, {
+                type: event.target
+                  .value as unknown as (typeof NodeType)[keyof typeof NodeType],
+              });
+            }}
+          >
+            {(Object.keys(NodeType) as Array<keyof typeof NodeType>).map(
+              (x) => {
+                return (
+                  <option
+                    key={x}
+                    value={NodeType[x]}
+                    selected={node.type == NodeType[x]}
+                  >
+                    Type: {x}
+                  </option>
+                );
+              }
+            )}
+          </select>
+        </div>
         {/* 個別部分 */}
         {/* data部分 dataはtypeによって内容が異なる */}
-        {node.type === 0 && (
+        {(node.type == NodeType.Plaintext ||
+          node.type == NodeType.Preprocessing) && (
           <MarkdownEditor
             ref={editorRef}
             initialValue={initialDataValue}
