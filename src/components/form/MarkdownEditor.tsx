@@ -4,6 +4,7 @@ import {
   useEffect,
   useImperativeHandle,
   useRef,
+  useState,
 } from "react";
 
 // EasyMDE Monkey patch
@@ -38,6 +39,7 @@ import "easymde/dist/easymde.min.css";
 export type MarkdownEditorProps = {
   initialValue?: string;
   onChange?: (value: string) => void;
+  validate?: (value: string) => void;
 };
 
 export type MarkdownEditorHandle = {
@@ -46,9 +48,11 @@ export type MarkdownEditorHandle = {
 };
 
 const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
-  ({ initialValue = "", onChange }, ref) => {
+  ({ initialValue = "", onChange, validate }, ref) => {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const editorRef = useRef<EasyMDE | null>(null);
+
+    const [errorMessage, setErrorMessage] = useState<string>("");
 
     // 親から呼べるメソッドを公開
     useImperativeHandle(ref, () => ({
@@ -69,7 +73,18 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
 
       // 値変更イベント
       editorRef.current.codemirror.on("blur", () => {
-        if (onChange) onChange(editorRef.current?.value() || "");
+        if (validate) {
+          try {
+            validate(editorRef.current?.value() || "");
+            setErrorMessage("");
+            if (onChange) onChange(editorRef.current?.value() || "");
+          } catch (e: unknown) {
+            setErrorMessage(String(e as SyntaxError));
+          }
+        } else {
+          setErrorMessage("");
+          if (onChange) onChange(editorRef.current?.value() || "");
+        }
       });
 
       // cleanup
@@ -77,10 +92,13 @@ const MarkdownEditor = forwardRef<MarkdownEditorHandle, MarkdownEditorProps>(
         editorRef.current?.toTextArea();
         editorRef.current = null;
       };
-    }, [initialValue, onChange]);
+    }, [initialValue, onChange, setErrorMessage, validate]);
 
     return (
       <div style={{ width: "100%" }}>
+        {errorMessage != "" && (
+          <label className="block text-red-400 px-1">{errorMessage}</label>
+        )}
         <textarea ref={textareaRef} />
       </div>
     );

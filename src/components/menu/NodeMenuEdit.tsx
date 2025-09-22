@@ -142,7 +142,7 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
             {/* NodeOptions.method: API | AI */}
             {
               <div className="mb-5">
-                <label className="block text-black px-1 mt-2">API Method</label>
+                <label className="block text-black px-1">API Method</label>
                 <Select
                   id="api-method"
                   options={APIMethod}
@@ -157,35 +157,43 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
               </div>
             }
 
-            {/* NodeOptions.header: API | AI */}
-            {
-              <div className="mb-5">
-                <label className="block text-black px-1 mt-2">Header</label>
-              </div>
-            }
-
             {/* NodeOptions.query: API | AI */}
             {
               <div className="mb-5">
-                <label className="block text-black px-1 mt-2">
+                <label className="block text-black px-1">
                   URL Query Params
                 </label>
+              </div>
+            }
+
+            {/* NodeOptions.header: API | AI */}
+            {
+              <div className="mb-5">
+                <label className="block text-black px-1">Header</label>
               </div>
             }
 
             {/* NodeOptions.body: API | AI */}
             {
               <div className="mb-5">
-                <label className="block text-black px-1 mt-2">Body</label>
+                <label className="block text-black px-1">Body</label>
+                <MarkdownEditor
+                  ref={editorRef}
+                  initialValue={initialDataValue}
+                  onChange={(value) => {
+                    updateNodeOptions(node.id, {
+                      options: { data: value },
+                    });
+                  }}
+                  validate={JSON.parse}
+                ></MarkdownEditor>
               </div>
             }
 
             {/* NodeOptions.timeout: API | AI */}
             {
               <div className="mb-5">
-                <label className="block text-black px-1 mt-2">
-                  Request Timeout
-                </label>
+                <label className="block text-black px-1">Request Timeout</label>
               </div>
             }
           </>
