@@ -107,8 +107,9 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
           {/* アイコン */}
           <use
             href={`#node-foreground-${node?.type ?? 0}`}
-            x={NODE_WIDTH / 2}
-            y={NODE_HEIGHT / 2}
+            x={10}
+            y={-480 + 98}
+            width={NODE_WIDTH - 20}
           />
 
           {/* Utils Button */}

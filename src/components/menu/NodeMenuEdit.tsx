@@ -84,7 +84,7 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
           </select>
         </div>
         {/* 個別部分 */}
-        {/* data部分 dataはtypeによって内容が異なる */}
+        {/* data: Text */}
         {(node.type == NodeType.Plaintext ||
           node.type == NodeType.Preprocessing) && (
           <MarkdownEditor
@@ -97,6 +97,10 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
             }}
           ></MarkdownEditor>
         )}
+        {/* data: Picture */}
+        {/* data: Video */}
+        {/* caption: Picture | Video */}
+        {/* requests: API | AI */}
       </div>
     </>
   );
