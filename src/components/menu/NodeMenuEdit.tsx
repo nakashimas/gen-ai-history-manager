@@ -157,6 +157,25 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
               </div>
             }
 
+            {/* NodeOptions.endpoint: API | AI */}
+            {
+              <div className="mb-5">
+                <label className="block text-black px-1">Endpoint</label>
+                <input
+                  type="text"
+                  id="api-endpoint"
+                  className="border border-gray-300 text-sm rounded-lg block w-full p-2.5 text-black dark:text-white"
+                  placeholder="https://path/to/endpoint"
+                  value={(nodeOption.options as APINodeOptions)?.endpoint}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    updateNodeOptions(node.id, {
+                      options: { endpoint: event.target.value },
+                    });
+                  }}
+                />
+              </div>
+            }
+
             {/* NodeOptions.query: API | AI */}
             {
               <div className="mb-5">
@@ -179,10 +198,10 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
                 <label className="block text-black px-1">Body</label>
                 <MarkdownEditor
                   ref={editorRef}
-                  initialValue={initialDataValue}
+                  initialValue={(nodeOption.options as APINodeOptions)?.body}
                   onChange={(value) => {
                     updateNodeOptions(node.id, {
-                      options: { data: value },
+                      options: { body: value },
                     });
                   }}
                   validate={JSON.parse}
@@ -193,7 +212,23 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
             {/* NodeOptions.timeout: API | AI */}
             {
               <div className="mb-5">
-                <label className="block text-black px-1">Request Timeout</label>
+                <label className="block text-black px-1">
+                  Request Timeout (ms)
+                </label>
+                <input
+                  type="number"
+                  id="api-timeout"
+                  className="border border-gray-300 text-sm rounded-lg block w-full p-2.5 text-black dark:text-white"
+                  placeholder="1000"
+                  min={0}
+                  step={1}
+                  value={(nodeOption.options as APINodeOptions)?.timeout}
+                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    updateNodeOptions(node.id, {
+                      options: { timeout: parseFloat(event.target.value) },
+                    });
+                  }}
+                />
               </div>
             }
           </>
