@@ -5,6 +5,33 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
+
+// EasyMDE Monkey patch
+(function () {
+  const origAddEventListener = EventTarget.prototype.addEventListener;
+
+  EventTarget.prototype.addEventListener = function (
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions
+  ) {
+    const scrollEvents = ["touchstart", "touchmove", "mousewheel"];
+
+    if (scrollEvents.includes(type)) {
+      if (options === undefined) {
+        options = { passive: true };
+      } else if (typeof options === "boolean") {
+        options = { capture: options, passive: true };
+      } else {
+        // passive が false の場合でも true に上書き
+        options = { ...options, passive: true };
+      }
+    }
+
+    return origAddEventListener.call(this, type, listener, options);
+  };
+})();
+
 import EasyMDE from "easymde";
 import "easymde/dist/easymde.min.css";
 

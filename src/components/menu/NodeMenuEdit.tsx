@@ -6,7 +6,13 @@ import MarkdownEditor, {
 } from "../form/MarkdownEditor";
 import EditableTitle, { type EditableTitleHandle } from "../form/EditableTitle";
 import NodeMenuHelp from "./NodeMenuHelp";
-import { NodeType } from "../../contexts/GraphContextOptions";
+import {
+  APIMethod,
+  APIType,
+  NodeType,
+  type APINodeOptions,
+} from "../../contexts/GraphContextOptions";
+import Select from "../form/Select";
 
 const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
   recentDragSourceId,
@@ -29,6 +35,12 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
     "data" in nodeOption.options &&
     nodeOption.options.data
       ? nodeOption.options.data
+      : "";
+  const initialCaptionValue =
+    nodeOption?.options &&
+    "caption" in nodeOption.options &&
+    nodeOption.options.caption
+      ? nodeOption.options.caption
       : "";
 
   // 変更検知など
@@ -58,49 +70,126 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
         </div>
         <div className="mb-5 flex">
           {/* Node.type */}
-          <select
+          <Select
             id="node-type"
-            className="border border-gray-300 text-black text-sm rounded-lg block w-full p-1.5"
-            onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
+            options={NodeType}
+            selected={node.type}
+            onChange={(newValue) => {
               updateNode(node.id, {
-                type: event.target
-                  .value as unknown as (typeof NodeType)[keyof typeof NodeType],
+                type: newValue,
               });
             }}
-          >
-            {(Object.keys(NodeType) as Array<keyof typeof NodeType>).map(
-              (x) => {
-                return (
-                  <option
-                    key={x}
-                    value={NodeType[x]}
-                    selected={node.type == NodeType[x]}
-                  >
-                    Type: {x}
-                  </option>
-                );
-              }
-            )}
-          </select>
+            renderLabel={(x) => `Type: ${x}`}
+          />
         </div>
+
         {/* 個別部分 */}
-        {/* data: Text */}
+        {/* NodeOptions.data: Text */}
         {(node.type == NodeType.Plaintext ||
           node.type == NodeType.Preprocessing) && (
-          <MarkdownEditor
-            ref={editorRef}
-            initialValue={initialDataValue}
-            onChange={(value) => {
-              updateNodeOptions(node.id, {
-                options: { data: value },
-              });
-            }}
-          ></MarkdownEditor>
+          <div className="mb-5">
+            <MarkdownEditor
+              ref={editorRef}
+              initialValue={initialDataValue}
+              onChange={(value) => {
+                updateNodeOptions(node.id, {
+                  options: { data: value },
+                });
+              }}
+            ></MarkdownEditor>
+          </div>
         )}
-        {/* data: Picture */}
-        {/* data: Video */}
-        {/* caption: Picture | Video */}
+
+        {/* NodeOptions.data: Picture */}
+
+        {/* NodeOptions.data: Video */}
+
+        {/* NodeOptions.caption: Picture | Video */}
+        {(node.type == NodeType.Video || node.type == NodeType.Picture) && (
+          <div className="mb-5">
+            <label className="text-black px-1">And caption :</label>
+            <MarkdownEditor
+              ref={editorRef}
+              initialValue={initialCaptionValue}
+              onChange={(value) => {
+                updateNodeOptions(node.id, {
+                  options: { data: value },
+                });
+              }}
+            ></MarkdownEditor>
+          </div>
+        )}
+
         {/* requests: API | AI */}
+        {(node.type == NodeType.API || node.type == NodeType.AI) && (
+          <>
+            {/* NodeOptions.apiType: API | AI */}
+            <div className="mb-5">
+              <label className="block text-black px-1">API Type</label>
+              <Select
+                id="api-type"
+                options={APIType}
+                selected={(nodeOption.options as APINodeOptions)?.apiType}
+                onChange={(newValue) => {
+                  updateNodeOptions(node.id, {
+                    options: { apiType: newValue },
+                  });
+                }}
+                renderLabel={(x) => x}
+              />
+            </div>
+
+            {/* NodeOptions.method: API | AI */}
+            {
+              <div className="mb-5">
+                <label className="block text-black px-1 mt-2">API Method</label>
+                <Select
+                  id="api-method"
+                  options={APIMethod}
+                  selected={(nodeOption.options as APINodeOptions)?.method}
+                  onChange={(newValue) => {
+                    updateNodeOptions(node.id, {
+                      options: { method: newValue },
+                    });
+                  }}
+                  renderLabel={(x) => x}
+                />
+              </div>
+            }
+
+            {/* NodeOptions.header: API | AI */}
+            {
+              <div className="mb-5">
+                <label className="block text-black px-1 mt-2">Header</label>
+              </div>
+            }
+
+            {/* NodeOptions.query: API | AI */}
+            {
+              <div className="mb-5">
+                <label className="block text-black px-1 mt-2">
+                  URL Query Params
+                </label>
+              </div>
+            }
+
+            {/* NodeOptions.body: API | AI */}
+            {
+              <div className="mb-5">
+                <label className="block text-black px-1 mt-2">Body</label>
+              </div>
+            }
+
+            {/* NodeOptions.timeout: API | AI */}
+            {
+              <div className="mb-5">
+                <label className="block text-black px-1 mt-2">
+                  Request Timeout
+                </label>
+              </div>
+            }
+          </>
+        )}
       </div>
     </>
   );

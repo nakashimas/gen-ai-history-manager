@@ -38,17 +38,35 @@ export type PreprocessingNodeOptions = OverrideOptions<
   }
 >;
 
+// API 定義
+export const APIType = {
+  REST: 0,
+  RPC: 1,
+} as const;
+
+type APIType = (typeof APIType)[keyof typeof APIType];
+
+export const APIMethod = {
+  GET: 0,
+  POST: 1,
+  PUT: 2,
+  DELETE: 3,
+  PATCH: 4,
+} as const;
+
+type APIMethod = (typeof APIMethod)[keyof typeof APIMethod];
+
 export type APINodeOptions = OverrideOptions<
   BaseNodeOptions,
   {
-    apiType?: "REST" | "RPC";
+    apiType?: APIType;
     endpoint?: string; // APIのURL
-    method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH"; // RESTのみ
+    method?: APIMethod; // RESTのみ
     headers?: Record<string, string>; // 任意のHTTPヘッダー
     query?: Record<string, string | number | boolean>; // クエリパラメータ
     body?: unknown; // JSONやFormDataなど自由に設定可能
     timeout?: number; // タイムアウト設定
-    responseType?: "json" | "text" | "blob"; // 期待するレスポンスの形式
+    responseType?: string; // 期待するレスポンスの形式
   }
 >;
 
