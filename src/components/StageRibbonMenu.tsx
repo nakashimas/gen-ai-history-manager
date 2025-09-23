@@ -26,7 +26,7 @@ const StageRibbonMenuButton: React.FC<{
 };
 
 const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
-  const { addNode } = useGraph();
+  const { nodes, edges, nodeOptions, addNode } = useGraph();
   const [isRibbonOpen, setIsRibbonOpen] = useState<boolean>(true);
   const { openMenu } = useMenu();
   const { startDrag } = useDrag();
@@ -52,16 +52,79 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
             });
           }}
         />
+        <div className="mx-1 h-5 border border-gray-500"></div>
+        {/* 再生 */}
+        <StageRibbonMenuButton
+          icon="play_arrow"
+          title="Start From Selected Position"
+          handleClick={() => {}}
+        />
+        <StageRibbonMenuButton
+          icon="pause"
+          title="Stop"
+          handleClick={() => {}}
+        />
+        <div className="mx-1 h-5 border border-gray-500"></div>
+        <StageRibbonMenuButton
+          icon="rotate_left"
+          title="Clear Results"
+          handleClick={() => {}}
+        />
+        <div className="mx-1 h-5 border border-gray-500"></div>
+        {/* 保存 */}
         <StageRibbonMenuButton
           icon="upload"
           title="Upload Save Data"
-          handleClick={() => {}}
+          handleClick={() => {
+            const input = document.createElement("input");
+            input.type = "file";
+            input.accept = "application/json";
+            input.onchange = async (ev: Event) => {
+              // JSONを読み込み;
+              const file = (
+                ev as unknown as React.ChangeEvent<HTMLInputElement>
+              ).target?.files?.[0];
+              if (!file) return;
+              const jsonText = await file.text();
+
+              try {
+                const jsonData = JSON.parse(jsonText);
+                // ここで更新;
+                console.log(jsonData);
+              } catch (err) {
+                console.error("Invalid JSON file: ", err);
+              }
+            };
+            input.click();
+          }}
         />
         <StageRibbonMenuButton
           icon="download"
           title="Download Save Data AS JSON"
-          handleClick={() => {}}
+          handleClick={() => {
+            const data = {
+              nodes,
+              edges,
+              nodeOptions,
+            };
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], {
+              type: "application/json",
+            });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[-:.]/g, "");
+            a.download = `genai-hm-${timestamp}.json`;
+            a.click();
+
+            URL.revokeObjectURL(url);
+          }}
         />
+        <div className="mx-1 h-5 border border-gray-500"></div>
         {/* 設定とヘルプ */}
         <StageRibbonMenuButton
           icon="bug_report"
