@@ -11,9 +11,12 @@ import {
   APIType,
   NodeType,
   type APINodeOptions,
+  type PlaintextNodeOptions,
 } from "../../contexts/GraphContextOptions";
 import Select from "../form/Select";
 import Series from "../form/Series";
+import InputFile, { type InputFileHandle } from "../form/InputFile";
+import { base64ToFile } from "../../utils/base64ToFile";
 
 const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
   recentDragSourceId,
@@ -35,6 +38,7 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
   // TODO: このあたり整理できないか
   const editorRef = useRef<MarkdownEditorHandle>(null);
   const titleRef = useRef<EditableTitleHandle>(null);
+  const fileRef = useRef<InputFileHandle>(null);
 
   const initialTitleValue = nodeOption?.options?.label ?? "";
   const initialDataValue =
@@ -53,8 +57,22 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
   // 変更検知など
   useEffect(() => {
     titleRef?.current?.setTitle(initialTitleValue);
-    editorRef?.current?.setValue(initialDataValue);
-  }, [initialTitleValue, initialDataValue]);
+
+    if (node?.type == NodeType.Video || node?.type == NodeType.Picture) {
+      // Picture OR Video
+      editorRef?.current?.setValue(initialCaptionValue);
+      fileRef?.current?.setData(
+        base64ToFile(
+          initialDataValue,
+          (nodeOption?.options as PlaintextNodeOptions)?.filename ?? "file"
+        )
+      );
+    } else {
+      // Others
+      editorRef?.current?.setValue(initialDataValue);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialTitleValue, initialDataValue, initialCaptionValue, node?.type]);
 
   if (!node) return <NodeMenuHelp />;
 
@@ -108,8 +126,46 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
         )}
 
         {/* NodeOptions.data: Picture */}
+        {node.type == NodeType.Picture && (
+          <InputFile
+            ref={fileRef}
+            onChange={(newFile) => {
+              if (newFile) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  const base64 = reader.result as string;
+                  updateNodeOptions(node.id, {
+                    options: { data: base64, filename: newFile.name },
+                  });
+                };
+                reader.readAsDataURL(newFile); // Base64 DataURL
+              } else {
+                updateNodeOptions(node.id, { options: { data: undefined } });
+              }
+            }}
+          />
+        )}
 
         {/* NodeOptions.data: Video */}
+        {node.type == NodeType.Video && (
+          <InputFile
+            ref={fileRef}
+            onChange={(newFile) => {
+              if (newFile) {
+                const reader = new FileReader();
+                reader.onload = () => {
+                  const base64 = reader.result as string;
+                  updateNodeOptions(node.id, {
+                    options: { data: base64, filename: newFile.name },
+                  });
+                };
+                reader.readAsDataURL(newFile); // Base64 DataURL
+              } else {
+                updateNodeOptions(node.id, { options: { data: undefined } });
+              }
+            }}
+          />
+        )}
 
         {/* NodeOptions.caption: Picture | Video */}
         {(node.type == NodeType.Video || node.type == NodeType.Picture) && (
@@ -120,7 +176,7 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
               initialValue={initialCaptionValue}
               onChange={(value) => {
                 updateNodeOptions(node.id, {
-                  options: { data: value },
+                  options: { caption: value },
                 });
               }}
             ></MarkdownEditor>
