@@ -7,6 +7,7 @@ import {
 } from "./GraphContext";
 import { isEqualContentsId } from "../utils/contentsId";
 import { deepMerge } from "../utils/deepMerge";
+import { isCycle } from "../utils/isCycle";
 
 export const GraphContextProvider: React.FC<{
   children: React.ReactNode;
@@ -38,6 +39,26 @@ export const GraphContextProvider: React.FC<{
 
   // --- エッジ操作 ---
   const addEdge = (edge: EdgeProps) => {
+    // Validations
+    // 1. 自己ループ禁止
+    if (edge.from === edge.to) {
+      console.warn("Edge Warning | Will Create Loop:", edge);
+      return;
+    }
+
+    // 2. 同一エッジ禁止
+    if (edges.some((e) => e.from === edge.from && e.to === edge.to)) {
+      console.warn("Edge Warning | Duplicate:", edge);
+      return;
+    }
+
+    // 3. サイクル検出
+    if (isCycle(edges, edge)) {
+      console.warn("Edge Warning | Will Create Cycle:", edge);
+      return;
+    }
+
+    // Add Edge
     setEdges((prev) => [...prev, edge]);
   };
 
