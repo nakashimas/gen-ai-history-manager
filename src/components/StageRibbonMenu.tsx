@@ -26,7 +26,15 @@ const StageRibbonMenuButton: React.FC<{
 };
 
 const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
-  const { nodes, edges, nodeOptions, addNode } = useGraph();
+  const {
+    nodes,
+    edges,
+    nodeOptions,
+    addNode,
+    setNodes,
+    setEdges,
+    setNodeOptions,
+  } = useGraph();
   const [isRibbonOpen, setIsRibbonOpen] = useState<boolean>(true);
   const { openMenu } = useMenu();
   const { startDrag } = useDrag();
@@ -90,7 +98,9 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
               try {
                 const jsonData = JSON.parse(jsonText);
                 // ここで更新;
-                console.log(jsonData);
+                setNodes(jsonData.nodes ?? {});
+                setEdges(jsonData.edges ?? {});
+                setNodeOptions(jsonData.nodeOptions ?? {});
               } catch (err) {
                 console.error("Invalid JSON file: ", err);
               }
