@@ -54,10 +54,17 @@ export const GraphContextProvider: React.FC<{
     const prevOption = nodeOptions.find((n) => isEqualContentsId(n.id, id));
     if (!prevOption) addNodeOptions({ id: id });
 
-    console.log(nodeOptions, partial);
-
     setNodeOptions((prev) =>
       prev.map((o) => (isEqualContentsId(o.id, id) ? deepMerge(o, partial) : o))
+    );
+  };
+
+  const overwriteNodeOptions = (id: string, partial: NodeOptionProps) => {
+    const prevOption = nodeOptions.find((n) => isEqualContentsId(n.id, id));
+    if (!prevOption) addNodeOptions({ id: id });
+
+    setNodeOptions((prev) =>
+      prev.map((o) => (isEqualContentsId(o.id, id) ? partial : o))
     );
   };
 
@@ -78,6 +85,7 @@ export const GraphContextProvider: React.FC<{
         removeEdge,
         addNodeOptions,
         updateNodeOptions,
+        overwriteNodeOptions,
         removeNodeOptions,
       }}
     >

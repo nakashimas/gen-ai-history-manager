@@ -13,12 +13,19 @@ import {
   type APINodeOptions,
 } from "../../contexts/GraphContextOptions";
 import Select from "../form/Select";
+import Series from "../form/Series";
 
 const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
   recentDragSourceId,
 }) => {
   // 元データ取得
-  const { nodes, nodeOptions, updateNode, updateNodeOptions } = useGraph();
+  const {
+    nodes,
+    nodeOptions,
+    updateNode,
+    updateNodeOptions,
+    overwriteNodeOptions,
+  } = useGraph();
   const node = nodes.find((n) => isEqualContentsId(n.id, recentDragSourceId));
   const nodeOption = nodeOptions.find((n) =>
     isEqualContentsId(n.id, recentDragSourceId)
@@ -182,6 +189,18 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
                 <label className="block text-black px-1">
                   URL Query Params
                 </label>
+                <Series
+                  items={(nodeOption.options as APINodeOptions)?.query}
+                  onChange={(value) => {
+                    overwriteNodeOptions(node.id, {
+                      ...nodeOption,
+                      options: {
+                        ...(nodeOption.options as APINodeOptions),
+                        query: value as Record<string, string>,
+                      },
+                    });
+                  }}
+                ></Series>
               </div>
             }
 
@@ -189,6 +208,18 @@ const NodeMenuEdit: React.FC<{ recentDragSourceId: string }> = ({
             {
               <div className="mb-5">
                 <label className="block text-black px-1">Header</label>
+                <Series
+                  items={(nodeOption.options as APINodeOptions)?.headers}
+                  onChange={(value) => {
+                    overwriteNodeOptions(node.id, {
+                      ...nodeOption,
+                      options: {
+                        ...(nodeOption.options as APINodeOptions),
+                        headers: value as Record<string, string>,
+                      },
+                    });
+                  }}
+                ></Series>
               </div>
             }
 

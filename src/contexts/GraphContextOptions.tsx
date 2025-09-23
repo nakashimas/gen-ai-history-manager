@@ -63,7 +63,7 @@ export type APINodeOptions = OverrideOptions<
     endpoint?: string; // APIのURL
     method?: APIMethod; // RESTのみ
     headers?: Record<string, string>; // 任意のHTTPヘッダー
-    query?: Record<string, string | number | boolean>; // クエリパラメータ
+    query?: Record<string, string>; // クエリパラメータ
     body?: string; // リクエストボディ
     data?: string; // レスポンス
     timeout?: number; // タイムアウト設定
