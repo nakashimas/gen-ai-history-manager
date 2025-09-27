@@ -65,6 +65,7 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
     // 保持するデータ
     const { openMenu } = useMenu();
     const [pos, setPos] = useState({ x, y });
+    const [isDragging, setIsDragging] = useState(false);
     const [recentDragSourceId, setRecentDragSourceId] =
       useState<string>(GLOBAL_HELP_MENU_ID);
 
@@ -78,6 +79,7 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
 
     const handleDragStart = (id: string, mouseX: number, mouseY: number) => {
       // クリック位置と要素の位置の差を記憶
+      setIsDragging(true);
       dragOffset.current = { dx: mouseX - pos.x, dy: mouseY - pos.y };
       onDragStart?.(id, pos.x, pos.y);
     };
@@ -92,6 +94,7 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
     };
 
     const handleDragEnd = (id: string, mouseX: number, mouseY: number) => {
+      setIsDragging(false);
       const newX = mouseX - dragOffset.current.dx;
       const newY = mouseY - dragOffset.current.dy;
 
@@ -105,8 +108,8 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
     }, [dragInfo, setRecentDragSourceId]);
 
     useEffect(() => {
-      setPos({ x, y });
-    }, [x, y]);
+      if (!isDragging) setPos({ x, y });
+    }, [x, y, isDragging]);
 
     return (
       <>
