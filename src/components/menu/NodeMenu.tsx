@@ -63,7 +63,7 @@ const NodeMenu: React.FC<{ children?: React.ReactNode }> = () => {
         style={{ height: (isMenuOpen ? menuHeight : 0) + "px" }}
         className="bg-white overflow-hidden pointer-events-auto"
       >
-        <div className="overflow-y-auto h-full">
+        <div className="overflow-y-auto h-full px-2">
           {menuMap[recentDragSourceId] ?? (
             <NodeMenuEdit recentDragSourceId={recentDragSourceId} />
           )}
