@@ -102,7 +102,25 @@ export const ContentsNodeDefs: React.FC = () => {
           width={NODE_WIDTH}
           height={NODE_HEIGHT}
           fill={COLOR_BLACK}
-          opacity={0.5}
+          opacity={0.3}
+          rx={EDGE_MARKER_WIDTH / 4 + 2}
+        />
+        <rect
+          x={EDGE_MARKER_WIDTH / 4}
+          y={EDGE_MARKER_WIDTH / 4}
+          width={NODE_WIDTH - EDGE_MARKER_WIDTH / 2}
+          height={NODE_HEIGHT - EDGE_MARKER_WIDTH / 2}
+          fill={COLOR_WHITE}
+          rx={EDGE_MARKER_WIDTH / 4}
+        />
+      </g>
+
+      <g id="node-background-selected">
+        <rect
+          width={NODE_WIDTH}
+          height={NODE_HEIGHT}
+          fill={COLOR_BLACK}
+          opacity={1}
           rx={EDGE_MARKER_WIDTH / 4 + 2}
         />
         <rect

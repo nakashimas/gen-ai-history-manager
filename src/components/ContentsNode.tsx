@@ -1,8 +1,18 @@
-import { useState, useImperativeHandle, forwardRef, useRef } from "react";
+import {
+  useState,
+  useImperativeHandle,
+  forwardRef,
+  useRef,
+  useEffect,
+} from "react";
 import { DraggableWidgetWrapper } from "./DraggableWidgetWrapper";
 import { useMenu } from "../hooks/useMenu";
 import { ContentsEdgeDraft } from "./ContentsEdgeDraft";
-import { NODE_HEIGHT, NODE_WIDTH } from "../utils/constants";
+import {
+  GLOBAL_HELP_MENU_ID,
+  NODE_HEIGHT,
+  NODE_WIDTH,
+} from "../utils/constants";
 import {
   EDGE_ID_PREFIX,
   isEqualContentsId,
@@ -10,6 +20,7 @@ import {
   resolveId,
 } from "../utils/contentsId";
 import { useGraph } from "../hooks/useGraph";
+import { useDrag } from "../hooks/useDrag";
 
 export type ContentsNodeProps = {
   id: string;
@@ -45,6 +56,7 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
   ) => {
     // 元データ取得
     const { nodes, nodeOptions } = useGraph();
+    const { dragInfo } = useDrag();
     const node = nodes.find((n) => isEqualContentsId(n.id, id));
     const nodeOption = nodeOptions.find((n) => isEqualContentsId(n.id, id)) ?? {
       id: resolveId(node?.id ?? ""),
@@ -53,6 +65,8 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
     // 保持するデータ
     const { openMenu } = useMenu();
     const [pos, setPos] = useState({ x, y });
+    const [recentDragSourceId, setRecentDragSourceId] =
+      useState<string>(GLOBAL_HELP_MENU_ID);
 
     // ドラッグ開始時に計算する補正オフセットを保持
     const dragOffset = useRef({ dx: 0, dy: 0 });
@@ -86,6 +100,10 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
       onDragEnd?.(id, newX, newY);
     };
 
+    useEffect(() => {
+      if (dragInfo?.sourceId) setRecentDragSourceId(dragInfo.sourceId);
+    }, [dragInfo, setRecentDragSourceId]);
+
     return (
       <>
         <DraggableWidgetWrapper
@@ -100,9 +118,13 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
           <text dy={-6} dx={3}>
             {nodeOption.options?.label}
           </text>
-
           {/* 背景 */}
-          <use href="#node-background" />
+
+          {isEqualContentsId(recentDragSourceId, id) ? (
+            <use href="#node-background-selected" />
+          ) : (
+            <use href="#node-background" />
+          )}
 
           {/* アイコン */}
           <use
@@ -111,7 +133,6 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
             y={-480 + 98}
             width={NODE_WIDTH - 20}
           />
-
           {/* Utils Button */}
           <use
             x={NODE_WIDTH / 2}
