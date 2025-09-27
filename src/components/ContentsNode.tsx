@@ -104,6 +104,10 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
       if (dragInfo?.sourceId) setRecentDragSourceId(dragInfo.sourceId);
     }, [dragInfo, setRecentDragSourceId]);
 
+    useEffect(() => {
+      setPos({ x, y });
+    }, [x, y]);
+
     return (
       <>
         <DraggableWidgetWrapper

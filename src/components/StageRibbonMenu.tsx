@@ -5,8 +5,11 @@ import {
   GLOBAL_DEBUG_MENU_ID,
   GLOBAL_HELP_MENU_ID,
   GLOBAL_SETTINGS_MENU_ID,
+  NODE_HEIGHT,
+  NODE_WIDTH,
 } from "../utils/constants";
 import { useGraph } from "../hooks/useGraph";
+import { topologicalSortProps } from "../utils/topologicalSort";
 
 const StageRibbonMenuButton: React.FC<{
   icon: string;
@@ -73,6 +76,27 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
           handleClick={() => {}}
         />
         <div className="mx-1 h-5 border border-gray-500"></div>
+        {/* Nodeの一括変更 */}
+        <StageRibbonMenuButton
+          icon="rebase_edit"
+          title="Auto Layout (Topological)"
+          handleClick={() => {
+            const layout: string[][] = topologicalSortProps(nodes, edges);
+            // nodes の新しい配列を作る
+            const newNodes = layout.flatMap((layer, layerIndex) =>
+              layer.map((id, nodeIndex) => {
+                const oldNode = nodes.find((n) => n.id === id)!;
+                return {
+                  ...oldNode,
+                  x: layerIndex * NODE_WIDTH * 1.5,
+                  y: nodeIndex * NODE_HEIGHT * 1.2,
+                };
+              })
+            );
+
+            setNodes(newNodes);
+          }}
+        />
         <StageRibbonMenuButton
           icon="rotate_left"
           title="Clear Results"
@@ -98,9 +122,9 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
               try {
                 const jsonData = JSON.parse(jsonText);
                 // ここで更新;
-                setNodes(jsonData.nodes ?? {});
-                setEdges(jsonData.edges ?? {});
-                setNodeOptions(jsonData.nodeOptions ?? {});
+                setNodes(jsonData.nodes ?? []);
+                setEdges(jsonData.edges ?? []);
+                setNodeOptions(jsonData.nodeOptions ?? []);
               } catch (err) {
                 console.error("Invalid JSON file: ", err);
               }
