@@ -1,0 +1,35 @@
+import { createContext } from "react";
+import { type EdgeProps, type NodeProps } from "./GraphContext";
+
+export type ExecutionNodeState =
+  | "pending"
+  | "ready"
+  | "running"
+  | "done"
+  | "cancelled";
+
+export type ExecutionNode = {
+  id: string;
+  state: ExecutionNodeState;
+  dependents: string[];
+  remainingDependencies: number;
+};
+
+export type ExecutionNodeContextType = {
+  operations: Map<string, AbortController>;
+  graph: Map<string, ExecutionNode>;
+  // accessor
+  setGraph: (newGraph: Map<string, ExecutionNode>) => void;
+  setGraphProps: (nodes: NodeProps[], edges: EdgeProps[]) => void;
+  // operations
+  start: (id: string) => void; // 特定ノードから開始
+  startAll: () => void; // 全体開始
+  stop: (id: string) => void; // 特定ノード停止
+  stopAll: () => void; // 全体停止
+  reset: (id: string) => void; // 特定ノードリセット
+  resetAll: () => void; // 全体リセット
+};
+
+export const ExecutionContext = createContext<ExecutionNodeContextType | null>(
+  null
+);

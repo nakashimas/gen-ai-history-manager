@@ -18,6 +18,7 @@ import {
   resolveId,
 } from "../utils/contentsId";
 import { ContentsNodeDefs } from "./ContentsNodeDefs";
+import { ExecutionProvider } from "../contexts/ExecutionProvider";
 
 export const Stage: React.FC = () => {
   const { zoom, offset, bind } = useZoomPan(1, { x: 0, y: 0 });
@@ -119,28 +120,30 @@ export const Stage: React.FC = () => {
   return (
     <NodeMenuProvider>
       <DraggableWidgetProvider>
-        <StageRibbonMenu />
-        <StageContext.Provider value={{ zoom, offset }}>
-          <div className="w-full h-full overflow-hidden">
-            <svg
-              width="100%"
-              height="100%"
-              {...bind} // wheel/pan イベントを適用
-            >
-              {/* 参照用 */}
-              <ContentsNodeDefs />
-
-              {/* Stage 全体 transform */}
-              <g
-                transform={`translate(${offset.x}, ${offset.y}) scale(${zoom})`}
+        <ExecutionProvider>
+          <StageRibbonMenu />
+          <StageContext.Provider value={{ zoom, offset }}>
+            <div className="w-full h-full overflow-hidden">
+              <svg
+                width="100%"
+                height="100%"
+                {...bind} // wheel/pan イベントを適用
               >
-                {nodes.map(generateNode)}
-                {edges.map(generateEdge)}
-              </g>
-            </svg>
-          </div>
-        </StageContext.Provider>
-        <NodeMenu />
+                {/* 参照用 */}
+                <ContentsNodeDefs />
+
+                {/* Stage 全体 transform */}
+                <g
+                  transform={`translate(${offset.x}, ${offset.y}) scale(${zoom})`}
+                >
+                  {nodes.map(generateNode)}
+                  {edges.map(generateEdge)}
+                </g>
+              </svg>
+            </div>
+          </StageContext.Provider>
+          <NodeMenu />
+        </ExecutionProvider>
       </DraggableWidgetProvider>
     </NodeMenuProvider>
   );

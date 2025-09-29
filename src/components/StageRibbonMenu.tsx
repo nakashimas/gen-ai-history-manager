@@ -10,6 +10,7 @@ import {
 } from "../utils/constants";
 import { useGraph } from "../hooks/useGraph";
 import { topologicalSortProps } from "../utils/topologicalSort";
+import { useExecution } from "../hooks/useExecution";
 
 const StageRibbonMenuButton: React.FC<{
   icon: string;
@@ -39,6 +40,7 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
     setNodeOptions,
   } = useGraph();
   const [isRibbonOpen, setIsRibbonOpen] = useState<boolean>(true);
+  const { setGraphProps, startAll, stopAll, resetAll } = useExecution();
   const { openMenu } = useMenu();
   const { startDrag } = useDrag();
 
@@ -68,12 +70,17 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
         <StageRibbonMenuButton
           icon="play_arrow"
           title="Start From Selected Position"
-          handleClick={() => {}}
+          handleClick={async () => {
+            setGraphProps(nodes, edges);
+            startAll();
+          }}
         />
         <StageRibbonMenuButton
           icon="pause"
           title="Stop"
-          handleClick={() => {}}
+          handleClick={async () => {
+            stopAll();
+          }}
         />
         <div className="mx-1 h-5 border border-gray-500"></div>
         {/* Nodeの一括変更 */}
@@ -100,7 +107,9 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
         <StageRibbonMenuButton
           icon="rotate_left"
           title="Clear Results"
-          handleClick={() => {}}
+          handleClick={() => {
+            resetAll();
+          }}
         />
         <div className="mx-1 h-5 border border-gray-500"></div>
         {/* 保存 */}
