@@ -21,6 +21,7 @@ import {
 } from "../utils/contentsId";
 import { useGraph } from "../hooks/useGraph";
 import { useDrag } from "../hooks/useDrag";
+import type { ExecutionNodeState } from "../contexts/ExecutionContext";
 
 export type ContentsNodeProps = {
   id: string;
@@ -37,6 +38,16 @@ export type ContentsNodeProps = {
 export type ContentsNodeHandle = {
   getPos: () => { x: number; y: number };
   setPos: (x: number, y: number) => void;
+  getState: () => ExecutionNodeState;
+  setState: (newState: ExecutionNodeState) => void;
+};
+
+const stateColor: Record<ExecutionNodeState, string> = {
+  cancelled: "oklch(70.4% 0.191 22.216)",
+  done: "oklch(79.2% 0.209 151.711)",
+  pending: "oklch(70.7% 0.022 261.325)",
+  ready: "oklch(70.7% 0.022 261.325)",
+  running: "oklch(70.7% 0.165 254.624)",
 };
 
 export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
@@ -66,6 +77,7 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
     const { openMenu } = useMenu();
     const [pos, setPos] = useState({ x, y });
     const [isDragging, setIsDragging] = useState(false);
+    const [state, setState] = useState<ExecutionNodeState>("pending");
     const [recentDragSourceId, setRecentDragSourceId] =
       useState<string>(GLOBAL_HELP_MENU_ID);
 
@@ -75,6 +87,8 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
     useImperativeHandle(ref, () => ({
       getPos: () => pos,
       setPos: (x: number, y: number) => setPos({ x, y }),
+      getState: () => state,
+      setState: (newState: ExecutionNodeState) => setState(newState),
     }));
 
     const handleDragStart = (id: string, mouseX: number, mouseY: number) => {
@@ -111,6 +125,16 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
       if (!isDragging) setPos({ x, y });
     }, [x, y, isDragging]);
 
+    const renderBackground = () => {
+      if (state == "running") {
+        return <use href="#node-background-running" />;
+      } else if (isEqualContentsId(recentDragSourceId, id)) {
+        return <use href="#node-background-selected" />;
+      } else {
+        return <use href="#node-background" />;
+      }
+    };
+
     return (
       <>
         <DraggableWidgetWrapper
@@ -125,13 +149,9 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
           <text dy={-6} dx={3}>
             {nodeOption.options?.label}
           </text>
-          {/* 背景 */}
 
-          {isEqualContentsId(recentDragSourceId, id) ? (
-            <use href="#node-background-selected" />
-          ) : (
-            <use href="#node-background" />
-          )}
+          {/* 背景 */}
+          {renderBackground()}
 
           {/* アイコン */}
           <use
@@ -152,6 +172,12 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
             y={NODE_HEIGHT}
             href="#node-reproduction"
             onClick={onClickNodeReproduction}
+          />
+          <use
+            x={(NODE_WIDTH * 3) / 4}
+            y={NODE_HEIGHT}
+            href="#node-status"
+            color={stateColor[state]}
           />
         </DraggableWidgetWrapper>
         <ContentsEdgeDraft

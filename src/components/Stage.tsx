@@ -120,7 +120,17 @@ export const Stage: React.FC = () => {
   return (
     <NodeMenuProvider>
       <DraggableWidgetProvider>
-        <ExecutionProvider>
+        <ExecutionProvider
+          onUpdate={(id, state) => {
+            if (id) {
+              nodeRefs.current.get(id)?.current?.setState(state);
+            } else {
+              nodeRefs.current.forEach((n) => {
+                n?.current?.setState(state);
+              });
+            }
+          }}
+        >
           <StageRibbonMenu />
           <StageContext.Provider value={{ zoom, offset }}>
             <div className="w-full h-full overflow-hidden">

@@ -96,6 +96,11 @@ export const ContentsNodeDefs: React.FC = () => {
         />
       </g>
 
+      <g id="node-status" className="cursor-pointer">
+        <circle cx={0} cy={0} r={EDGE_MARKER_WIDTH} fill={COLOR_BLACK} />
+        <circle cx={0} cy={0} r={EDGE_MARKER_WIDTH / 2} fill="currentColor" />
+      </g>
+
       {/* Node背景 */}
       <g id="node-background">
         <rect
@@ -130,6 +135,32 @@ export const ContentsNodeDefs: React.FC = () => {
           height={NODE_HEIGHT - EDGE_MARKER_WIDTH / 2}
           fill={COLOR_WHITE}
           rx={EDGE_MARKER_WIDTH / 4}
+        />
+      </g>
+
+      <g id="node-background-running">
+        <rect
+          width={NODE_WIDTH}
+          height={NODE_HEIGHT}
+          fill={COLOR_BLACK}
+          opacity={1}
+          rx={EDGE_MARKER_WIDTH / 4 + 2}
+        />
+        <rect
+          x={EDGE_MARKER_WIDTH / 4}
+          y={EDGE_MARKER_WIDTH / 4}
+          width={NODE_WIDTH - EDGE_MARKER_WIDTH / 2}
+          height={NODE_HEIGHT - EDGE_MARKER_WIDTH / 2}
+          fill={COLOR_WHITE}
+          rx={EDGE_MARKER_WIDTH / 4}
+          // Dot
+          stroke={COLOR_BLACK}
+          strokeWidth={EDGE_MARKER_WIDTH / 2}
+          strokeDasharray="4 6"
+          strokeDashoffset={0}
+          style={{
+            animation: "dash-move 0.5s linear infinite",
+          }}
         />
       </g>
 

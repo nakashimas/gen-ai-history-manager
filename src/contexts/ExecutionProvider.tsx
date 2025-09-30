@@ -54,7 +54,11 @@ const buildExecutionGraphProps = (nodes: NodeProps[], edges: EdgeProps[]) => {
 
 export const ExecutionProvider: React.FC<{
   children: React.ReactNode;
-  onUpdate?: (graph: Map<string, ExecutionNode>) => void;
+  onUpdate?: (
+    id: string | null,
+    state: ExecutionNodeState,
+    graph: Map<string, ExecutionNode>
+  ) => void;
 }> = ({ children, onUpdate }) => {
   const [operations, setOperations] = useState<Map<string, AbortController>>(
     new Map()
@@ -80,7 +84,7 @@ export const ExecutionProvider: React.FC<{
   function updateNode(id: string, state: ExecutionNodeState) {
     const node = graph.get(id)!;
     node.state = state;
-    onUpdate?.(new Map(graph));
+    onUpdate?.(id, state, new Map(graph));
   }
 
   const resetCancelledNodes = () => {
@@ -90,7 +94,7 @@ export const ExecutionProvider: React.FC<{
         node.remainingDependencies = node.dependents.length; // 依存数を再計算
       }
     });
-    onUpdate?.(new Map(graph));
+    onUpdate?.(null, "pending", new Map(graph));
   };
 
   function completeNode(id: string) {
@@ -103,7 +107,7 @@ export const ExecutionProvider: React.FC<{
         depNode.state = "ready";
       }
     });
-    onUpdate?.(new Map(graph));
+    onUpdate?.(id, "done", new Map(graph));
   }
 
   function getReadyNodes(graph: Map<string, ExecutionNode>): string[] {
