@@ -12,6 +12,7 @@ export type ExecutionNode = {
   id: string;
   state: ExecutionNodeState;
   dependents: string[];
+  parents: string[];
   remainingDependencies: number;
 };
 

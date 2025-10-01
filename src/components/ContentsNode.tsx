@@ -178,7 +178,9 @@ export const ContentsNode = forwardRef<ContentsNodeHandle, ContentsNodeProps>(
             y={NODE_HEIGHT}
             href="#node-status"
             color={stateColor[state]}
-          />
+          >
+            <title>{state}</title>
+          </use>
         </DraggableWidgetWrapper>
         <ContentsEdgeDraft
           id={id + EDGE_ID_PREFIX}

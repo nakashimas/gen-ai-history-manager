@@ -6,6 +6,13 @@ import {
 } from "./ExecutionContext";
 import type { EdgeProps, NodeProps } from "./GraphContext";
 import { resolveId } from "../utils/contentsId";
+import { useGraph } from "../hooks/useGraph";
+import {
+  NodeType,
+  type PictureNodeOptions,
+  type PlaintextNodeOptions,
+  type VideoNodeOptions,
+} from "./GraphContextOptions";
 
 /**
  * 実行順序を整理し、親子関係を参照しやすい形式に変更する
@@ -25,12 +32,14 @@ const buildExecutionGraph = (
       state: "pending",
       dependents: [],
       remainingDependencies: 0,
+      parents: [], // ★追加
     });
   });
 
   edges.forEach(({ from, to }) => {
     graph.get(from)!.dependents.push(to);
     graph.get(to)!.remainingDependencies++;
+    graph.get(to)!.parents.push(from); // ★親を登録
   });
 
   return graph;
@@ -66,19 +75,79 @@ export const ExecutionProvider: React.FC<{
   const [graph, setGraph] = useState<Map<string, ExecutionNode>>(new Map());
   const [aborted, setAborted] = useState(false);
 
-  const runner = async (id: string, signal: AbortSignal) => {
-    console.log("Start", id);
-    await new Promise<void>((resolve, reject) => {
-      // ここが実際の処理
-      const timer = setTimeout(resolve, 2000);
+  const { nodes, nodeOptions, updateNodeOptions } = useGraph();
 
+  const runner = async (id: string, signal: AbortSignal) => {
+    await new Promise<void>((resolve, reject) => {
       // Abort
       signal.addEventListener("abort", () => {
-        clearTimeout(timer);
-        reject(new Error("Cancelled"));
+        reject(new Error("Process Cancelled: Aborted"));
       });
+
+      const targetNode = nodes.find((n) => n.id == id);
+      const targetOptions = nodeOptions.find((n) => n.id == id);
+      const parents = graph.get(id)?.parents ?? [];
+      const parentResults = new Map<string, unknown>(
+        parents.map((pid) => [
+          pid,
+          nodeOptions.find((n) => n.id === pid)?.options?.result,
+        ])
+      );
+
+      // 実際の処理
+      switch (String(targetNode?.type)) {
+        case String(NodeType.Plaintext):
+          if (targetOptions) {
+            updateNodeOptions(id, {
+              options: {
+                result: {
+                  type: NodeType.Plaintext,
+                  ...(targetOptions?.options as PlaintextNodeOptions),
+                },
+              },
+            });
+          }
+          break;
+        case String(NodeType.Picture):
+          if (targetOptions) {
+            updateNodeOptions(id, {
+              options: {
+                result: {
+                  type: NodeType.Picture,
+                  ...(targetOptions?.options as PictureNodeOptions),
+                },
+              },
+            });
+          }
+          break;
+        case String(NodeType.Video):
+          if (targetOptions) {
+            updateNodeOptions(id, {
+              options: {
+                result: {
+                  type: NodeType.Video,
+                  ...(targetOptions?.options as VideoNodeOptions),
+                },
+              },
+            });
+          }
+          break;
+        case String(NodeType.Preprocessing):
+          console.log("Preprocessing", parentResults);
+          break;
+        case String(NodeType.API):
+          console.log("API", parentResults);
+          break;
+        case String(NodeType.AI):
+          console.log("AI", parentResults);
+          break;
+        default:
+          console.log(`Process Cancelled: Unknown ${targetNode?.type}`);
+      }
+      resolve();
     });
-    console.log("Done", id);
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   };
 
   function updateNode(id: string, state: ExecutionNodeState) {
@@ -107,7 +176,6 @@ export const ExecutionProvider: React.FC<{
         depNode.state = "ready";
       }
     });
-    onUpdate?.(id, "done", new Map(graph));
   }
 
   function getReadyNodes(graph: Map<string, ExecutionNode>): string[] {
