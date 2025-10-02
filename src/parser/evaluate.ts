@@ -1,3 +1,4 @@
+import { baseEnv, type Env, type Value } from "./builtin";
 import { parse } from "./template";
 
 // ---- AST 型定義 ----
@@ -40,14 +41,6 @@ export interface FunctionDef {
   name: string;
   body: ASTNode[];
 }
-
-// ---- 評価結果の型 ----
-export type Value = string | number | boolean | Value[] | null;
-
-// ---- 環境定義 ----
-export type Env = {
-  [key: string]: ((...args: Value[]) => Value) | Value;
-};
 
 // ---- 評価関数 (AST input) ----
 export function evaluate(
@@ -112,28 +105,24 @@ export function evaluate(
 }
 
 // ---- 評価関数 (TEXT input) ----
-export function evaluateTemplate(input: string) {
-  const env: Env = {
-    upper: (x: Value): Value => {
-      if (typeof x === "string") return x.toUpperCase();
-      throw new Error("upper: argument must be string");
-    },
-    repeat: (x: Value, n: Value): Value => {
-      if (typeof x === "string" && typeof n === "number") {
-        return x.repeat(n);
-      }
-      throw new Error("repeat: invalid arguments: " + x + " " + n);
-    },
-  };
-
+export function evaluateTemplate(input: string, env: Env = baseEnv): Value {
   const ast = parse(input, { startRule: "Program" });
 
   if (ast) {
-    return (ast as ASTNode[])
-      .map((stmt) => evaluate(stmt, env))
-      .filter((e) => e)
-      .pop();
+    return (
+      (ast as ASTNode[])
+        .map((stmt) => evaluate(stmt, env))
+        .filter((e) => e)
+        .pop() ?? null
+    );
   }
 
   return null;
+}
+
+// ---- 評価関数 (Execution Graph Value input) ----
+export function evaluateExecution(input: string) {
+  // graphから値を参照できるビルトイン関数を追加
+  const env = { ...baseEnv };
+  return evaluateTemplate(input, env);
 }
