@@ -63,6 +63,7 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
               y: 5,
               type: 0,
             });
+            setGraphProps(nodes, edges);
           }}
         />
         <div className="mx-1 h-5 border border-gray-500"></div>
@@ -71,8 +72,7 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
           icon="play_arrow"
           title="Start From Selected Position"
           handleClick={async () => {
-            setGraphProps(nodes, edges);
-            startAll();
+            startAll(nodes, edges);
           }}
         />
         <StageRibbonMenuButton
@@ -108,7 +108,7 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
           icon="rotate_left"
           title="Clear Results"
           handleClick={() => {
-            resetAll();
+            resetAll(nodes, edges);
           }}
         />
         <div className="mx-1 h-5 border border-gray-500"></div>
@@ -137,6 +137,7 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
               } catch (err) {
                 console.error("Invalid JSON file: ", err);
               }
+              resetAll(nodes, edges);
             };
             input.click();
           }}

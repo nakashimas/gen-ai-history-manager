@@ -4,11 +4,12 @@ import {
   type ExecutionNode,
   type ExecutionNodeState,
 } from "./ExecutionContext";
-import type { EdgeProps, NodeProps } from "./GraphContext";
+import type { EdgeProps, NodeProps, NodeType } from "./GraphContext";
 import { resolveId } from "../utils/contentsId";
 import { useGraph } from "../hooks/useGraph";
 import {
-  NodeType,
+  NodeType as NodeTypeEnum,
+  type NodeOptions,
   type PictureNodeOptions,
   type PlaintextNodeOptions,
   type VideoNodeOptions,
@@ -73,9 +74,12 @@ export const ExecutionProvider: React.FC<{
     new Map()
   );
   const [graph, setGraph] = useState<Map<string, ExecutionNode>>(new Map());
+  const [results, setResults] = useState<
+    Map<string, { type: NodeType; options: NodeOptions }>
+  >(new Map());
   const [aborted, setAborted] = useState(false);
 
-  const { nodes, nodeOptions, updateNodeOptions } = useGraph();
+  const { nodes, nodeOptions } = useGraph();
 
   const runner = async (id: string, signal: AbortSignal) => {
     await new Promise<void>((resolve, reject) => {
@@ -87,58 +91,62 @@ export const ExecutionProvider: React.FC<{
       const targetNode = nodes.find((n) => n.id == id);
       const targetOptions = nodeOptions.find((n) => n.id == id);
       const parents = graph.get(id)?.parents ?? [];
-      const parentResults = new Map<string, unknown>(
+      const parentResults = new Map<string, NodeOptions | null | undefined>(
         parents.map((pid) => [
           pid,
-          nodeOptions.find((n) => n.id === pid)?.options?.result,
+          Array.from(results.entries()).find((item) => item[0] === pid)?.[1]
+            ?.options,
         ])
       );
 
       // 実際の処理
       switch (String(targetNode?.type)) {
-        case String(NodeType.Plaintext):
+        case String(NodeTypeEnum.Plaintext):
           if (targetOptions) {
-            updateNodeOptions(id, {
-              options: {
-                result: {
-                  type: NodeType.Plaintext,
+            setResults({
+              ...results,
+              [id]: {
+                type: NodeTypeEnum.Plaintext,
+                options: {
                   ...(targetOptions?.options as PlaintextNodeOptions),
                 },
               },
             });
           }
           break;
-        case String(NodeType.Picture):
+        case String(NodeTypeEnum.Picture):
           if (targetOptions) {
-            updateNodeOptions(id, {
-              options: {
-                result: {
-                  type: NodeType.Picture,
+            setResults({
+              ...results,
+              [id]: {
+                type: NodeTypeEnum.Plaintext,
+                options: {
                   ...(targetOptions?.options as PictureNodeOptions),
                 },
               },
             });
           }
           break;
-        case String(NodeType.Video):
+        case String(NodeTypeEnum.Video):
           if (targetOptions) {
-            updateNodeOptions(id, {
-              options: {
-                result: {
-                  type: NodeType.Video,
+            setResults({
+              ...results,
+              [id]: {
+                type: NodeTypeEnum.Plaintext,
+                options: {
                   ...(targetOptions?.options as VideoNodeOptions),
                 },
               },
             });
           }
           break;
-        case String(NodeType.Preprocessing):
+        case String(NodeTypeEnum.Preprocessing):
           console.log("Preprocessing", parentResults);
           break;
-        case String(NodeType.API):
+        case String(NodeTypeEnum.API):
           console.log("API", parentResults);
           break;
-        case String(NodeType.AI):
+        case String(NodeTypeEnum.AI):
           console.log("AI", parentResults);
           break;
         default:
@@ -233,7 +241,33 @@ export const ExecutionProvider: React.FC<{
     setGraph(buildExecutionGraphProps(nodes, edges));
   };
 
-  const start = (id: string) => {
+  /** nodes/edges が渡されたら setGraphProps してから fn を実行する共通処理 */
+  function withGraphUpdate<Args extends unknown[]>(
+    fn: (...args: Args) => void
+  ): {
+    (...args: Args): void; // 普通に呼ぶケース
+    (...args: [...Args, ...[nodes: NodeProps[], edges: EdgeProps[]]]): void; // nodes/edgesを最後に渡すケース
+  } {
+    return (...args: unknown[]) => {
+      const maybeNodes = args[args.length - 2];
+      const maybeEdges = args[args.length - 1];
+
+      if (
+        Array.isArray(maybeNodes) &&
+        Array.isArray(maybeEdges) &&
+        maybeNodes.every((n) => "id" in n) &&
+        maybeEdges.every((e) => "id" in e)
+      ) {
+        // nodes/edges が渡されている場合
+        setGraphProps(maybeNodes as NodeProps[], maybeEdges as EdgeProps[]);
+        args = args.slice(0, -2); // nodes/edges を取り除いて残りを fn に渡す
+      }
+
+      fn(...(args as Args));
+    };
+  }
+
+  const start = withGraphUpdate((id: string) => {
     const node = graph.get(id);
     if (!node) return;
 
@@ -244,38 +278,43 @@ export const ExecutionProvider: React.FC<{
 
     const loop = createLoop();
     loop();
-  };
+  });
 
-  const startAll = () => {
+  const startAll = withGraphUpdate(() => {
     setAborted(false);
     resetCancelledNodes();
     const loop = createLoop();
     loop();
-  };
+  });
 
-  const stop = (id: string) => {
+  const stop = withGraphUpdate((id: string) => {
     operations.get(id)?.abort();
     console.warn(`Operation Canceled: ${id}`);
-  };
+  });
 
-  const stopAll = () => {
+  const stopAll = withGraphUpdate(() => {
     setAborted(true);
     operations.forEach((c) => c.abort());
     console.warn("Operation Canceled: ALL");
-  };
+  });
 
-  const reset = (id: string) => {
+  const reset = withGraphUpdate((id: string) => {
     stop(id);
+    resetCancelledNodes();
+    setResults(
+      new Map(Array.from(results.entries()).filter((item) => !(item[0] == id)))
+    );
     setAborted(false);
     console.warn(`Operation Reset Output: ${id}`);
-  };
+  });
 
-  const resetAll = () => {
+  const resetAll = withGraphUpdate(() => {
     stopAll();
-    setAborted(false);
     resetCancelledNodes();
+    setResults(new Map());
+    setAborted(false);
     console.warn("Operation Reset Output: ALL");
-  };
+  });
 
   return (
     <ExecutionContext.Provider

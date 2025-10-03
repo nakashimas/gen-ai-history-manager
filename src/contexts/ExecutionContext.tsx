@@ -23,12 +23,12 @@ export type ExecutionNodeContextType = {
   setGraph: (newGraph: Map<string, ExecutionNode>) => void;
   setGraphProps: (nodes: NodeProps[], edges: EdgeProps[]) => void;
   // operations
-  start: (id: string) => void; // 特定ノードから開始
-  startAll: () => void; // 全体開始
-  stop: (id: string) => void; // 特定ノード停止
-  stopAll: () => void; // 全体停止
-  reset: (id: string) => void; // 特定ノードリセット
-  resetAll: () => void; // 全体リセット
+  start: (id: string, nodes?: NodeProps[], edges?: EdgeProps[]) => void; // 特定ノードから開始
+  startAll: (nodes?: NodeProps[], edges?: EdgeProps[]) => void; // 全体開始
+  stop: (id: string, nodes?: NodeProps[], edges?: EdgeProps[]) => void; // 特定ノード停止
+  stopAll: (nodes?: NodeProps[], edges?: EdgeProps[]) => void; // 全体停止
+  reset: (id: string, nodes?: NodeProps[], edges?: EdgeProps[]) => void; // 特定ノードリセット
+  resetAll: (nodes?: NodeProps[], edges?: EdgeProps[]) => void; // 全体リセット
 };
 
 export const ExecutionContext = createContext<ExecutionNodeContextType | null>(
