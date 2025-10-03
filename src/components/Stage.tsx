@@ -122,11 +122,20 @@ export const Stage: React.FC = () => {
       <DraggableWidgetProvider>
         <ExecutionProvider
           onUpdate={(id, state) => {
-            if (id) {
+            if (id && state) {
               nodeRefs.current.get(id)?.current?.setState(state);
-            } else {
+            } else if (state) {
               nodeRefs.current.forEach((n) => {
                 n?.current?.setState(state);
+              });
+            } else {
+              nodeRefs.current.forEach((n) => {
+                const currentState = n?.current?.getState() ?? "pending";
+                // 一度違うstateをセットして強制的に再描画する
+                n?.current?.setState(
+                  currentState == "pending" ? "ready" : "pending"
+                );
+                n?.current?.setState(currentState);
               });
             }
           }}

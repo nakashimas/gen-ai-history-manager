@@ -1,3 +1,4 @@
+import type { NodeOptions } from "../contexts/GraphContextOptions";
 import { baseEnv, type Env, type Value } from "./builtin";
 import { parse } from "./template";
 
@@ -120,9 +121,41 @@ export function evaluateTemplate(input: string, env: Env = baseEnv): Value {
   return null;
 }
 
+// ---- インライン評価: "Hello {{ 'world' | upper }}" → "Hello WORLD" ----
+export function evaluateTemplateInline(
+  input: string,
+  env: Env = baseEnv
+): string {
+  return input.replace(/\{\{([^}]+)\}\}/g, (_, expr) => {
+    try {
+      const result = evaluateTemplate(expr.trim(), { ...env });
+      return result !== null && result !== undefined ? String(result) : "";
+    } catch (e) {
+      console.error("evaluateTemplateInline error:", e);
+      return "";
+    }
+  });
+}
+
 // ---- 評価関数 (Execution Graph Value input) ----
-export function evaluateExecution(input: string) {
+export function evaluateExecution(
+  input: string,
+  parentResults: Map<string, NodeOptions | null | undefined>
+) {
   // graphから値を参照できるビルトイン関数を追加
-  const env = { ...baseEnv };
-  return evaluateTemplate(input, env);
+  const env = {
+    ...baseEnv,
+    getResult: (idx: Value, key: Value) => {
+      if (typeof idx === "number" && typeof key === "string") {
+        const targetKey = Array.from(parentResults.keys())[idx];
+        const targetOptions = parentResults.get(targetKey);
+        if (targetOptions) return (targetOptions as Record<string, Value>)[key];
+        return "<NA>";
+      }
+      throw new Error(
+        `getResult: invalid arguments ${typeof idx} ${typeof key}`
+      );
+    },
+  };
+  return evaluateTemplateInline(input, env);
 }

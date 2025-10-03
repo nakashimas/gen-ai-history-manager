@@ -9,11 +9,16 @@ import { resolveId } from "../utils/contentsId";
 import { useGraph } from "../hooks/useGraph";
 import {
   NodeType as NodeTypeEnum,
+  type AINodeOptions,
+  type APINodeOptions,
   type NodeOptions,
   type PictureNodeOptions,
   type PlaintextNodeOptions,
+  type PreprocessingNodeOptions,
   type VideoNodeOptions,
 } from "./GraphContextOptions";
+import { evaluateExecution } from "../parser/evaluate";
+import { sendAPINodeRequest } from "../utils/sendAPINodeRequest";
 
 /**
  * 実行順序を整理し、親子関係を参照しやすい形式に変更する
@@ -66,7 +71,7 @@ export const ExecutionProvider: React.FC<{
   children: React.ReactNode;
   onUpdate?: (
     id: string | null,
-    state: ExecutionNodeState,
+    state: ExecutionNodeState | null,
     graph: Map<string, ExecutionNode>
   ) => void;
 }> = ({ children, onUpdate }) => {
@@ -103,12 +108,15 @@ export const ExecutionProvider: React.FC<{
       switch (String(targetNode?.type)) {
         case String(NodeTypeEnum.Plaintext):
           if (targetOptions) {
+            const plaintextOptions =
+              targetOptions?.options as PlaintextNodeOptions;
             setResults({
               ...results,
               [id]: {
                 type: NodeTypeEnum.Plaintext,
                 options: {
-                  ...(targetOptions?.options as PlaintextNodeOptions),
+                  ...plaintextOptions,
+                  result: plaintextOptions.data,
                 },
               },
             });
@@ -116,12 +124,14 @@ export const ExecutionProvider: React.FC<{
           break;
         case String(NodeTypeEnum.Picture):
           if (targetOptions) {
+            const pictureOptions = targetOptions?.options as PictureNodeOptions;
             setResults({
               ...results,
               [id]: {
-                type: NodeTypeEnum.Plaintext,
+                type: NodeTypeEnum.Picture,
                 options: {
-                  ...(targetOptions?.options as PictureNodeOptions),
+                  ...pictureOptions,
+                  result: pictureOptions.data,
                 },
               },
             });
@@ -129,25 +139,81 @@ export const ExecutionProvider: React.FC<{
           break;
         case String(NodeTypeEnum.Video):
           if (targetOptions) {
+            const videoOptions = targetOptions?.options as VideoNodeOptions;
             setResults({
               ...results,
               [id]: {
-                type: NodeTypeEnum.Plaintext,
+                type: NodeTypeEnum.Video,
                 options: {
-                  ...(targetOptions?.options as VideoNodeOptions),
+                  ...videoOptions,
+                  result: videoOptions.data,
                 },
               },
             });
           }
           break;
         case String(NodeTypeEnum.Preprocessing):
-          console.log("Preprocessing", parentResults);
+          if (targetOptions) {
+            const preprocessingOptions =
+              targetOptions?.options as PreprocessingNodeOptions;
+            setResults({
+              ...results,
+              [id]: {
+                type: NodeTypeEnum.Video,
+                options: {
+                  ...preprocessingOptions,
+                  result: evaluateExecution(
+                    preprocessingOptions.data ?? "",
+                    parentResults
+                  ),
+                },
+              },
+            });
+          }
           break;
         case String(NodeTypeEnum.API):
-          console.log("API", parentResults);
+          if (targetOptions) {
+            const apiOptions = targetOptions?.options as APINodeOptions;
+            let result: string;
+            sendAPINodeRequest(apiOptions)
+              .then((value) => {
+                result = JSON.stringify(value);
+              })
+              .catch((err) => {
+                result = JSON.stringify({ error: err });
+              })
+              .finally(() => {
+                setResults((prev) => ({
+                  ...prev,
+                  [id]: {
+                    type: NodeTypeEnum.API,
+                    options: { ...apiOptions, result },
+                  },
+                }));
+              });
+          }
           break;
         case String(NodeTypeEnum.AI):
-          console.log("AI", parentResults);
+          if (targetOptions) {
+            const aiOptions = targetOptions?.options as AINodeOptions;
+            let result: string;
+            sendAPINodeRequest(aiOptions)
+              .then((value) => {
+                result = JSON.stringify(value);
+              })
+              .catch((err) => {
+                result = JSON.stringify({ error: err });
+              })
+              .finally(() => {
+                setResults((prev) => ({
+                  ...prev,
+                  [id]: {
+                    type: NodeTypeEnum.AI,
+                    options: { ...aiOptions, result },
+                  },
+                }));
+              });
+          }
           break;
         default:
           console.log(`Process Cancelled: Unknown ${targetNode?.type}`);
@@ -156,6 +222,7 @@ export const ExecutionProvider: React.FC<{
     });
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log(results);
   };
 
   function updateNode(id: string, state: ExecutionNodeState) {

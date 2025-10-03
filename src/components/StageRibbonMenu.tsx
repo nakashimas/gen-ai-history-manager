@@ -20,7 +20,7 @@ const StageRibbonMenuButton: React.FC<{
 }> = ({ icon, title, handleClick }) => {
   return (
     <span
-      className="material-symbols-outlined text-white cursor-pointer text-[1.5rem]"
+      className="material-symbols-outlined text-white cursor-pointer text-[1.5rem] hover:font-bold"
       title={title}
       onClick={handleClick}
     >
