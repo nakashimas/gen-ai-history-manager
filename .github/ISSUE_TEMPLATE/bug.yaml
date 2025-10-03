@@ -1,0 +1,62 @@
+name: Bug
+description: バグを報告 / File a bug/issue
+title: "[BUG] <タイトル / Title>"
+labels: [Bug, Needs Triage]
+body:
+- type: checkboxes
+  attributes:
+    label: 既存のIssueはありますか? / Is there an existing issue?
+    description: 問題が既に報告されていないか確認してください。 / Please check if your issue has already been reported.
+    options:
+    - label: 既存のIssueを確認しました / I have searched existing issues
+      required: true
+- type: checkboxes
+  attributes:
+    label: 最新バージョンで発生しますか? / Does this occur on the latest version?
+    description: 最新版のライブラリやNode.jsを使っているか確認してください。 / Make sure you are using the latest version of the library or Node.js.
+    options:
+    - label: 最新版で確認済み / Confirmed on latest version
+      required: true
+- type: textarea
+  attributes:
+    label: 現在の挙動 / Current Behavior
+    description: 発生している問題を簡潔に記述してください。 / Describe the behavior you are experiencing.
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: 期待される挙動 / Expected Behavior
+    description: 期待していた動作を簡潔に記述してください。 / Describe what you expected to happen.
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: 再現手順 / Steps To Reproduce
+    description: 問題を再現するための手順を記載してください。 / Steps to reproduce the behavior.
+    value: |
+      1. 環境 / In this environment...
+      2. 設定 / With this config...
+      3. コマンド / Run '...'
+      4. エラーを確認 / See error...
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: 環境 / Environment
+    description: |
+      例 / Examples:
+        - **`node -v`**: Node.js: 18.0.0
+        - **OS名 / OS Name**: Ubuntu 20.04
+        - **システムモデル / System Model**: Macbook Pro
+        - **使用しているライブラリのバージョン / Library versions**: ...
+        - **設定 / Configs**:
+    value: |
+        - Node.js:
+        - OS Name:
+        - System Model Name:
+        - Library versions:
+        ```ini
+        ; copy and paste relevant configs here
+        ```
+  validations:
+    required: false
