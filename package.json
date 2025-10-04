@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "parser": "peggy --format es src/parser/template.pegjs -o src/parser/template.ts"
+    "parser": "peggy --format es src/parser/template.pegjs -o src/parser/template.js"
   },
   "dependencies": {
     "easymde": "^2.20.0",

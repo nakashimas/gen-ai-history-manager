@@ -1,5 +1,7 @@
 import type { NodeOptions } from "../contexts/GraphContextOptions";
 import { baseEnv, type Env, type Value } from "./builtin";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { parse } from "./template";
 
 // ---- AST 型定義 ----
