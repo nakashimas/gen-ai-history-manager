@@ -47,7 +47,9 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        const res = await fetch("/data/sample-generate-video.json");
+        const res = await fetch(
+          "/gen-ai-history-manager/data/sample-generate-video.json"
+        );
         if (!res.ok) {
           console.warn("sample.json が見つかりません:", res.status);
           return;
