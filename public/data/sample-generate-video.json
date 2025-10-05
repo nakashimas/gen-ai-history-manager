@@ -1,0 +1,167 @@
+{
+  "nodes": [
+    {
+      "id": "59d1eb9c-b709-43ac-9278-0f36202b36e4",
+      "x": 0,
+      "y": 0,
+      "type": 0
+    },
+    {
+      "id": "dba26559-4ddb-4abe-a56a-d795e0f4d0ca",
+      "x": 0,
+      "y": 222,
+      "type": 0
+    },
+    {
+      "id": "027c7f7f-d853-43e0-89c7-13a3b779af62",
+      "x": 150,
+      "y": 0,
+      "type": "5"
+    },
+    {
+      "id": "2a93978a-df2b-4943-b6bf-7f7d5f86d9fa",
+      "x": 150,
+      "y": 222,
+      "type": "5"
+    },
+    {
+      "id": "e2ea86b4-31ab-46ff-8e9d-542415de4237",
+      "x": 300,
+      "y": 0,
+      "type": "3"
+    },
+    {
+      "id": "891a5213-1a29-416d-b978-6ccaf03a8081",
+      "x": 300,
+      "y": 222,
+      "type": "3"
+    },
+    {
+      "id": "8bf8ccd7-9e2f-446b-aab8-ddd3419dfc3f",
+      "x": 450,
+      "y": 0,
+      "type": "5"
+    },
+    {
+      "id": "46339d53-268c-4228-880a-b5cce56f5077",
+      "x": 600,
+      "y": 0,
+      "type": "5"
+    }
+  ],
+  "edges": [
+    {
+      "id": "dc729aa8-c265-47e0-ae92-561ab0a8f997",
+      "from": "891a5213-1a29-416d-b978-6ccaf03a8081",
+      "to": "46339d53-268c-4228-880a-b5cce56f5077"
+    },
+    {
+      "id": "28061e4b-60c3-466b-bc17-b09e0591a1ae",
+      "from": "59d1eb9c-b709-43ac-9278-0f36202b36e4",
+      "to": "027c7f7f-d853-43e0-89c7-13a3b779af62"
+    },
+    {
+      "id": "edb0547a-bb46-46b0-9f1e-628e7f0bf6be",
+      "from": "027c7f7f-d853-43e0-89c7-13a3b779af62",
+      "to": "e2ea86b4-31ab-46ff-8e9d-542415de4237"
+    },
+    {
+      "id": "24f53785-fb8c-43b1-8227-f1f38572cdb5",
+      "from": "dba26559-4ddb-4abe-a56a-d795e0f4d0ca",
+      "to": "2a93978a-df2b-4943-b6bf-7f7d5f86d9fa"
+    },
+    {
+      "id": "9936d735-78c7-4982-ac8c-54425f008b01",
+      "from": "2a93978a-df2b-4943-b6bf-7f7d5f86d9fa",
+      "to": "891a5213-1a29-416d-b978-6ccaf03a8081"
+    },
+    {
+      "id": "03ec2eb5-afe2-4fb7-aea9-92ad1e232e88",
+      "from": "e2ea86b4-31ab-46ff-8e9d-542415de4237",
+      "to": "8bf8ccd7-9e2f-446b-aab8-ddd3419dfc3f"
+    },
+    {
+      "id": "3c7ae071-c5ad-4531-ba46-f5d512b2d69b",
+      "from": "8bf8ccd7-9e2f-446b-aab8-ddd3419dfc3f",
+      "to": "46339d53-268c-4228-880a-b5cce56f5077"
+    }
+  ],
+  "nodeOptions": [
+    {
+      "id": "891a5213-1a29-416d-b978-6ccaf03a8081",
+      "options": {
+        "label": "加工",
+        "data": ""
+      }
+    },
+    {
+      "id": "dba26559-4ddb-4abe-a56a-d795e0f4d0ca",
+      "options": {
+        "label": "動画プロンプト",
+        "data": ""
+      }
+    },
+    {
+      "id": "46339d53-268c-4228-880a-b5cce56f5077",
+      "options": {
+        "label": "動画生成"
+      }
+    },
+    {
+      "id": "59d1eb9c-b709-43ac-9278-0f36202b36e4",
+      "options": {
+        "label": "画像プロンプト",
+        "data": ""
+      }
+    },
+    {
+      "id": "027c7f7f-d853-43e0-89c7-13a3b779af62",
+      "options": {
+        "label": "プロンプト強化",
+        "method": "1",
+        "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "body": "{\n    \"contents\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [\n          {\n            \"text\": \"次のプロンプトを、AIモデルがより正確かつ詳細に理解できるように書き直してください。\\n\\n---\\n\\\"{{getResult(0, \"result\")}}\\\"\"\n          }\n        ]\n      }\n    ],\n    \"systemInstruction\": {\n      \"role\": \"system\",\n      \"parts\": [\n        {\n          \"text\": \"あなたはプロンプトエンジニアの専門家です。曖昧な依頼を、AIに最も適した形に書き換えることが得意です。\"\n        }\n      ]\n    },\n    \"generationConfig\": {\n      \"temperature\": 0.4,\n      \"maxOutputTokens\": 512\n    }\n  }",
+        "headers": {
+          "x-goog-api-key": "{{getLocalStorage(\"goole_api_key\")}}",
+          "Content-Type": "application/json"
+        },
+        "timeout": 60000
+      }
+    },
+    {
+      "id": "e2ea86b4-31ab-46ff-8e9d-542415de4237",
+      "options": {
+        "label": "加工",
+        "data": ""
+      }
+    },
+    {
+      "id": "2a93978a-df2b-4943-b6bf-7f7d5f86d9fa",
+      "options": {
+        "label": "プロンプト強化",
+        "method": "1",
+        "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "body": "{\n    \"contents\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [\n          {\n            \"text\": \"次のプロンプトを、AIモデルがより正確かつ詳細に理解できるように書き直してください。\\n\\n---\\n\\\"{{getResult(0, \"result\")}}\\\"\"\n          }\n        ]\n      }\n    ],\n    \"systemInstruction\": {\n      \"role\": \"system\",\n      \"parts\": [\n        {\n          \"text\": \"あなたはプロンプトエンジニアの専門家です。曖昧な依頼を、AIに最も適した形に書き換えることが得意です。\"\n        }\n      ]\n    },\n    \"generationConfig\": {\n      \"temperature\": 0.4,\n      \"maxOutputTokens\": 512\n    }\n  }",
+        "headers": {
+          "x-goog-api-key": "{{getLocalStorage(\"goole_api_key\")}}",
+          "Content-Type": "application/json"
+        },
+        "timeout": 60000
+      }
+    },
+    {
+      "id": "8bf8ccd7-9e2f-446b-aab8-ddd3419dfc3f",
+      "options": {
+        "label": "画像生成",
+        "method": "1",
+        "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "body": "{\n    \"contents\": [\n      {\n        \"role\": \"user\",\n        \"parts\": [\n          {\n            \"text\": \"{{getResult(0, \"result\")}}\"\n          }\n        ]\n      }\n    ],\n    \"generationConfig\": {\n      \"responseMimeType\": \"image/png\",\n      \"temperature\": 0.7\n    }\n  }",
+        "headers": {
+          "x-goog-api-key": "{{getLocalStorage(\"goole_api_key\")}}",
+          "Content-Type": "application/json"
+        },
+        "timeout": 60000
+      }
+    }
+  ]
+}

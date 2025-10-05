@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useMenu } from "../hooks/useMenu";
 import { useDrag } from "../hooks/useDrag";
 import {
@@ -43,6 +43,28 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
   const { setGraphProps, startAll, stopAll, resetAll } = useExecution();
   const { openMenu } = useMenu();
   const { startDrag } = useDrag();
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const res = await fetch("/data/sample-generate-video.json");
+        if (!res.ok) {
+          console.warn("sample.json が見つかりません:", res.status);
+          return;
+        }
+        const jsonData = await res.json();
+        setNodes(jsonData.nodes ?? []);
+        setEdges(jsonData.edges ?? []);
+        setNodeOptions(jsonData.nodeOptions ?? []);
+        resetAll(jsonData.nodes ?? [], jsonData.edges ?? []);
+      } catch (err) {
+        console.error("初期データの読み込みに失敗:", err);
+      }
+    };
+
+    loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // ← 初回マウント時のみ実行
 
   return (
     <div className="fixed top-[0px] left-0 w-full z-20 pointer-events-none select-none">
@@ -96,7 +118,7 @@ const StageRibbonMenu: React.FC<{ children?: React.ReactNode }> = () => {
                 return {
                   ...oldNode,
                   x: layerIndex * NODE_WIDTH * 1.5,
-                  y: nodeIndex * NODE_HEIGHT * 1.2,
+                  y: nodeIndex * NODE_HEIGHT * 1.5,
                 };
               })
             );
